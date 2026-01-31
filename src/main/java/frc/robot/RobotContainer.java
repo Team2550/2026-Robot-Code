@@ -11,6 +11,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -30,7 +31,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //Max speed variable for drive scaling
   public static final String maxSpeed = "Max Speed";
-   double speed = 0.0;
+   double speed = 100.0;
+    private boolean m_arcade = true;
+
 
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
@@ -40,14 +43,17 @@ public class RobotContainer {
       new CommandXboxController(Driver.kJoystickID);
 
   // Drive mode: false = tank (default), true = arcade
-  private boolean m_arcade = true;
+ 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    SmartDashboard.putBoolean("Drive Style", m_arcade);
+
     // Configure the trigger bindings
+
+        // Send to Elastic
+  
     configureBindings();
-    // Default drive command: start in TANK mode, allow toggling to ARCADE with A button
+    //  drive command
     m_driveSubsystem.setDefaultCommand(
         new RunCommand(
             () -> {
@@ -64,7 +70,13 @@ public class RobotContainer {
             m_driveSubsystem));
 
     // Toggle drive mode with the A button (press to toggle)
-   // m_driverController.a().onTrue(new InstantCommand(() -> m_arcade = !m_arcade));
+      m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_arcade = !m_arcade));
+
+
+
+    m_driverController.leftTrigger()
+    .onTrue(new InstantCommand(() -> speed = 1.0))
+    .onFalse(new InstantCommand(() -> speed = 0.6));
   }
 
   private double applyDeadbandAndScale(double value) {
@@ -74,7 +86,7 @@ public class RobotContainer {
 
 
 
-    return Math.copySign(Math.abs(value - SpeedChange.stickDeadband) / (1.0 - SpeedChange.stickDeadband) * (speed / 100), value);
+    return Math.copySign(Math.abs(value - SpeedChange.stickDeadband) / (1.0 - SpeedChange.stickDeadband) * speed, value);
   }
 
   /**
@@ -91,14 +103,7 @@ public class RobotContainer {
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
 
-    //Drive mode 
-    new NetworkButton("SmartDashBoard", "Drive Style")
-        .onTrue(new InstantCommand(() -> m_arcade = true))  //Set to arcade on true
-        .onFalse(new InstantCommand(() -> m_arcade = false)); //Set to tank on false
 
-    //Speed scaling based on SmartDashboard slider
-    speed = SmartDashboard.getNumber(maxSpeed, 0.0);
-    m_driverController.leftBumper().onTrue(new InstantCommand(() -> speed = 100));
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
