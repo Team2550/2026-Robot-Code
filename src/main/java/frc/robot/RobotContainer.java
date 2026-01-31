@@ -31,7 +31,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //Max speed variable for drive scaling
   public static final String maxSpeed = "Max Speed";
-   double speed = 100.0;
+   double speed = 0.6;
     private boolean m_arcade = true;
 
 
