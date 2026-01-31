@@ -18,17 +18,21 @@ public final class Constants {
 
       public static class SpeedChange{
           public static final double stickDeadband = 0.07;
-          // TODO make slider to change on shuffleboard
           public static final double maxStartSpeed = 50.00;
       }
 
 
-    // Joysticks and Buttons
+
     public static final class DrivePorts {
         public static final int LEFT_MASTER = 0;
         public static final int LEFT_FOLLOWER = 1;
         public static final int RIGHT_MASTER = 3;
         public static final int RIGHT_FOLLOWER = 2;
+    }
+
+    public static final class SubsystemPorts {
+        public static final int Shooter1Port = 4;
+        public static final int Shooter2Port = 5;
     }
 
         // Joysticks and Buttons

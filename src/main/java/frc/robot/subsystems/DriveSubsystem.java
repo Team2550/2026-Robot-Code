@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.DriverStation;
+
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -23,6 +24,7 @@ public class DriveSubsystem extends SubsystemBase {
     public DriveSubsystem() {
         // Configure defaults here (inversion, safety, etc.) if needed
         drive.setSafetyEnabled(true);
+    
     }
 
     /** Arcade drive helper (forward, rotation). */

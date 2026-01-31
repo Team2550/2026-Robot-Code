@@ -8,16 +8,12 @@ package frc.robot;
 import frc.robot.Constants.Controls.Driver;
 import frc.robot.Constants.SpeedChange;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.NetworkButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
@@ -30,12 +26,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //Max speed variable for drive scaling
-  public static final String maxSpeed = "Max Speed";
    double speed = 0.6;
     private boolean m_arcade = true;
 
 
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+
+  private final ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -50,7 +46,6 @@ public class RobotContainer {
 
     // Configure the trigger bindings
 
-        // Send to Elastic
   
     configureBindings();
     //  drive command
@@ -100,14 +95,16 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+  // new Trigger(m_ShooterSubsystem::exampleCondition)
+    //    .onTrue(new ExampleCommand(m_ShooterSubsystem));
 
 
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    m_driverController.rightTrigger()
+    .onTrue(m_ShooterSubsystem.StartMotor())
+   .onFalse(m_ShooterSubsystem.StopMotor());
   }
 
   /**
@@ -117,6 +114,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return Autos.exampleAuto(m_ShooterSubsystem);
   }
 }
