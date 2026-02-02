@@ -24,15 +24,20 @@ public final class Constants {
 
 
     public static final class DrivePorts {
-        public static final int LEFT_MASTER = 0;
-        public static final int LEFT_FOLLOWER = 1;
+        public static final int LEFT_MASTER = 0;   // 0
+        public static final int LEFT_FOLLOWER = 1;   //1
         public static final int RIGHT_MASTER = 3;
         public static final int RIGHT_FOLLOWER = 2;
     }
 
     public static final class SubsystemPorts {
-        public static final int Shooter1Port = 4;
-        public static final int Shooter2Port = 5;
+        //Shooter Ports
+        public static final int Shooter1Port = 4; //4
+        public static final int Shooter2Port = 5; //5
+        //Climber Port
+        public static final int ClimberPort = 6;
+        //Intake Port
+        public static final int IntakePort = 7;
     }
 
         // Joysticks and Buttons

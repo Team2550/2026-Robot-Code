@@ -10,6 +10,8 @@ import frc.robot.Constants.SpeedChange;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,6 +34,8 @@ public class RobotContainer {
 
 
   private final ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem();
+  private final ClimberSubsystem m_ClimberSubsystem = new ClimberSubsystem();
+  private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -102,9 +106,20 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
+
+    //Shooter control
     m_driverController.rightTrigger()
-    .onTrue(m_ShooterSubsystem.StartMotor())
-   .onFalse(m_ShooterSubsystem.StopMotor());
+    .onTrue(m_ShooterSubsystem.StartShoot())
+   .onFalse(m_ShooterSubsystem.StopShoot());
+
+   //Climber control
+       m_driverController.povUp().onTrue(m_ClimberSubsystem.UpMotor());
+       m_driverController.povDown().onTrue(m_ClimberSubsystem.DownMotor());
+
+       //Intake control
+       m_driverController.leftTrigger()
+        .onTrue(m_IntakeSubsystem.StartIntake())
+        .onFalse(m_IntakeSubsystem.StopIntake());
   }
 
   /**

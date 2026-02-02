@@ -50,7 +50,7 @@ private final PWMSparkMax Shooter1Motor;
   }
 
 
-      public Command StartMotor()
+      public Command StartShoot()
     {
         return this.run(()->{
             Shooter1Motor.set(1); 
@@ -58,7 +58,7 @@ private final PWMSparkMax Shooter1Motor;
         });
     }
 
-    public Command StopMotor()
+    public Command StopShoot()
     {
         return this.run(()->{
             Shooter1Motor.set(0); 
