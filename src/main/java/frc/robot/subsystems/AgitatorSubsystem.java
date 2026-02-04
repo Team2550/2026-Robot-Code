@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -11,28 +13,16 @@ import frc.robot.Constants;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-  // For PWM
+// For PWM
 //import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class AgitatorSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
- private SparkMax Shooter1Motor;
-  private SparkMax Shooter2Motor;
-
+private SparkMax AgitatorMotor;
 
   
-    public ShooterSubsystem() {
-      //For CAN
-
-          Shooter1Motor = new SparkMax(Constants.SubsystemPorts.Shooter1Port, MotorType.kBrushless);
-          Shooter2Motor = new SparkMax(Constants.SubsystemPorts.Shooter2Port, MotorType.kBrushless);
-
-
-
-
-    //For PWM
-  // Shooter1Motor = new PWMSparkMax(Constants.SubsystemPorts.Shooter1Port);
-  // Shooter2Motor = new PWMSparkMax(Constants.SubsystemPorts.Shooter2Port);
+    public AgitatorSubsystem() {
+   AgitatorMotor = new SparkMax(Constants.SubsystemPorts.AgitatorPort, MotorType.kBrushless);
  
     }
 
@@ -66,19 +56,23 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
 
-      public Command StartShoot()
+      public Command StartAgitator()
     {
         return this.run(()->{
-          Shooter1Motor.set(Constants.MotorSpeeds.MaxShooterSpeed); 
-           Shooter2Motor.set(Constants.MotorSpeeds.MaxShooterSpeed);
+            AgitatorMotor.set(1); 
+        });
+    }
+      public Command ReverseAgitator()
+    {
+        return this.run(()->{
+            AgitatorMotor.set(-1); 
         });
     }
 
-    public Command StopShoot()
+    public Command StopAgitator()
     {
         return this.run(()->{
-            Shooter1Motor.set(Constants.MotorSpeeds.MinShooterSpeed); 
-            Shooter2Motor.set(Constants.MotorSpeeds.MinShooterSpeed);
+            AgitatorMotor.set(0); 
         });
     }
 

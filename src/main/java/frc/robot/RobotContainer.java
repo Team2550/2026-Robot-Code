@@ -6,12 +6,14 @@ package frc.robot;
 
 
 import frc.robot.Constants.Controls.Driver;
+import frc.robot.Constants.Controls.Operator;
 import frc.robot.Constants.SpeedChange;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.AgitatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -28,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //Max speed variable for drive scaling
-   double speed = 0.6;
+   double speed = SpeedChange.maxNormalSpeed;
     private boolean m_arcade = true;
 
 
@@ -36,11 +38,16 @@ public class RobotContainer {
   private final ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem();
   private final ClimberSubsystem m_ClimberSubsystem = new ClimberSubsystem();
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
+  private final AgitatorSubsystem m_AgitatorSubsystem = new AgitatorSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(Driver.kJoystickID);
+    private final CommandXboxController m_operatorController =
+      new CommandXboxController(Operator.kJoystickID);
 
   // Drive mode: false = tank (default), true = arcade
  
@@ -74,8 +81,8 @@ public class RobotContainer {
 
 
     m_driverController.leftTrigger()
-    .onTrue(new InstantCommand(() -> speed = 1.0))
-    .onFalse(new InstantCommand(() -> speed = 0.6));
+    .onTrue(new InstantCommand(() -> speed = SpeedChange.maxBoostSpeed))
+    .onFalse(new InstantCommand(() -> speed = SpeedChange.maxNormalSpeed));
   }
 
   private double applyDeadbandAndScale(double value) {
@@ -107,20 +114,46 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
 
-    //Shooter control
-    m_driverController.rightTrigger()
-    .onTrue(m_ShooterSubsystem.StartShoot())
-   .onFalse(m_ShooterSubsystem.StopShoot());
 
-   //Climber control
-       m_driverController.povUp().onTrue(m_ClimberSubsystem.UpMotor());
-       m_driverController.povDown().onTrue(m_ClimberSubsystem.DownMotor());
+    //Driver Controls
+      //Shooter control
+      m_driverController.rightTrigger()
+        .onTrue(m_ShooterSubsystem.StartShoot())
+        .onFalse(m_ShooterSubsystem.StopShoot());
 
-       //Intake control
-       m_driverController.leftTrigger()
-        .onTrue(m_IntakeSubsystem.StartIntake())
-        .onFalse(m_IntakeSubsystem.StopIntake());
-  }
+
+    //Opertor Controls    
+      //Climber control
+        if (m_operatorController.povUp().getAsBoolean()) {
+         m_ClimberSubsystem.UpMotor();
+        } else if (m_operatorController.povDown().getAsBoolean()) {
+         m_ClimberSubsystem.DownMotor();
+        } else {
+          m_ClimberSubsystem.StopMotor();
+        }
+
+
+      //Intake control
+        if (m_operatorController.rightTrigger().getAsBoolean()) {
+          m_IntakeSubsystem.StartIntake();
+        } else if (m_operatorController.rightBumper().getAsBoolean()) {
+         m_IntakeSubsystem.ReverseIntake();
+        } else {
+          m_IntakeSubsystem.StopIntake();
+        }
+
+      //Agitator control
+        if (m_operatorController.leftTrigger().getAsBoolean()) {
+          m_AgitatorSubsystem.StartAgitator();
+        } else if (m_operatorController.leftBumper().getAsBoolean()) {
+         m_AgitatorSubsystem.ReverseAgitator();
+        } else {
+          m_AgitatorSubsystem.StopAgitator();
+        }
+
+
+
+  } 
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

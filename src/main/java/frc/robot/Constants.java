@@ -18,26 +18,38 @@ public final class Constants {
 
       public static class SpeedChange{
           public static final double stickDeadband = 0.07;
-          public static final double maxStartSpeed = 50.00;
+          public static final double maxBoostSpeed = 1.00;
+          public static final double maxNormalSpeed = 0.70;
       }
 
 
 
     public static final class DrivePorts {
+        //Drive Motor Ports
         public static final int LEFT_MASTER = 0;   // 0
         public static final int LEFT_FOLLOWER = 1;   //1
         public static final int RIGHT_MASTER = 3;
         public static final int RIGHT_FOLLOWER = 2;
+
+
     }
 
     public static final class SubsystemPorts {
+         //CAN Ports
         //Shooter Ports
-        public static final int Shooter1Port = 4; //4
-        public static final int Shooter2Port = 5; //5
+        public static final int Shooter1Port = 1; //4
+        public static final int Shooter2Port = 2; //5
         //Climber Port
-        public static final int ClimberPort = 6;
+        public static final int ClimberPort = 3;
         //Intake Port
-        public static final int IntakePort = 7;
+        public static final int IntakePort = 4;
+        //Agitator Port
+        public static final int AgitatorPort = 5;
+    }
+
+    public static final class MotorSpeeds {
+        public static final double MaxShooterSpeed = 1.0;
+        public static final double MinShooterSpeed = 0.0;
     }
 
         // Joysticks and Buttons
@@ -48,7 +60,7 @@ public final class Constants {
         }
         //Operator Joystick and Buttons
         public static final class Operator {
-            public static final int kJoystickID = 2;
+            public static final int kJoystickID = 1;
         }
     }
 

@@ -4,18 +4,32 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+  // For CAN
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+  // For PWM
+//import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+
+
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-private final PWMSparkMax IntakeMotor;
+private SparkMax IntakeMotor;
 
   
     public IntakeSubsystem() {
-   IntakeMotor = new PWMSparkMax(Constants.SubsystemPorts.IntakePort);
+
+      //For CAN
+
+          IntakeMotor = new SparkMax(Constants.SubsystemPorts.IntakePort, MotorType.kBrushless);
+          
+
+
+      //For PWM
+  // IntakeMotor = new PWMSparkMax(Constants.SubsystemPorts.IntakePort);
  
     }
 
@@ -53,6 +67,12 @@ private final PWMSparkMax IntakeMotor;
     {
         return this.run(()->{
             IntakeMotor.set(1); 
+        });
+    }
+      public Command ReverseIntake()
+    {
+        return this.run(()->{
+            IntakeMotor.set(-1); 
         });
     }
 
