@@ -4,12 +4,11 @@
 
 package frc.robot.subsystems;
 
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-  // For CAN
+// For CAN
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -18,63 +17,59 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class AgitatorSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-private SparkMax AgitatorMotor;
+  private SparkMax AgitatorMotor;
 
-  
-    public AgitatorSubsystem() {
-   AgitatorMotor = new SparkMax(Constants.SubsystemPorts.AgitatorPort, MotorType.kBrushless);
- 
-    }
+  public AgitatorSubsystem() {
+    AgitatorMotor = new SparkMax(Constants.SubsystemPorts.AgitatorPort, MotorType.kBrushless);
+
+  }
 
   /**
    * Example command factory method.
    *
    * @return a command
-   
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-           one-time action goes here 
-        });
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   * 
+   *         public Command exampleMethodCommand() {
+   *         // Inline construction of command goes here.
+   *         // Subsystem::RunOnce implicitly requires `this` subsystem.
+   *         return runOnce(
+   *         () -> {
+   *         one-time action goes here
+   *         });
+   *         }
+   * 
+   *         /**
+   *         An example method querying a boolean state of the subsystem (for
+   *         example, a digital sensor).
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
-   
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-*/
+   * 
+   *         public boolean exampleCondition() {
+   *         // Query some boolean state, such as a digital sensor.
+   *         return false;
+   *         }
+   */
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
   }
 
+  public Command StartAgitator() {
+    return this.run(() -> {
+      AgitatorMotor.set(Constants.MotorSpeeds.MaxAgitatorSpeed);
+    });
+  }
 
-      public Command StartAgitator()
-    {
-        return this.run(()->{
-            AgitatorMotor.set(1); 
-        });
-    }
-      public Command ReverseAgitator()
-    {
-        return this.run(()->{
-            AgitatorMotor.set(-1); 
-        });
-    }
+  public Command ReverseAgitator() {
+    return this.run(() -> {
+      AgitatorMotor.set(-Constants.MotorSpeeds.MaxAgitatorSpeed);
+    });
+  }
 
-    public Command StopAgitator()
-    {
-        return this.run(()->{
-            AgitatorMotor.set(0); 
-        });
-    }
-
+  public Command StopAgitator() {
+    return this.run(() -> {
+      AgitatorMotor.set(0);
+    });
+  }
 
 }
