@@ -22,7 +22,6 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private SparkMax Shooter1Motor;
   private SparkMax Shooter2Motor;
-  double ShooterSpeed = Constants.MotorSpeeds.MaxShooterSpeed;
 
   public ShooterSubsystem() {
     // For CAN
@@ -65,15 +64,14 @@ public class ShooterSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    // Read updated speed from dashboard
-    ShooterSpeed = SmartDashboard.getNumber("Motor Speed", ShooterSpeed);
+
 
   }
 
   public Command StartShoot() {
     return this.run(() -> {
-      Shooter1Motor.set((ShooterSpeed / 100));
-      Shooter2Motor.set((ShooterSpeed / 100));
+      Shooter1Motor.set(Constants.MotorSpeeds.MaxShooterSpeedOut);
+      Shooter2Motor.set(Constants.MotorSpeeds.MaxShooterSpeedOut);
     });
   }
 
@@ -86,8 +84,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command ReverseShoot() {
     return this.run(() -> {
-      Shooter1Motor.set(-(ShooterSpeed / 100));
-      Shooter2Motor.set(-(ShooterSpeed / 100));
+      Shooter1Motor.set(Constants.MotorSpeeds.MaxShooterSpeedIn);
+      Shooter2Motor.set(Constants.MotorSpeeds.MaxShooterSpeedIn);
     });
   }
 

@@ -123,47 +123,49 @@ public class RobotContainer {
       .onTrue(m_ShooterSubsystem.StartShoot())
       .onFalse(m_ShooterSubsystem.StopShoot());
      
+      m_driverController.rightBumper()
+      .onTrue(m_ShooterSubsystem.ReverseShoot())
+      .onFalse(m_ShooterSubsystem.StopShoot());
 
-
-     /* 
-    if (m_driverController.rightTrigger().getAsBoolean()) {
-      new RunCommand(() -> m_ShooterSubsystem.StartShoot());
-    } else if (m_driverController.rightBumper().getAsBoolean()) {
-      new RunCommand(() -> m_ShooterSubsystem.ReverseShoot());
-    } else {
-      new RunCommand(() -> m_ShooterSubsystem.StopShoot());
-    }
-
-    */
+  
+    
     // Opertor Controls
     // Climber control
-    /*
-     * if (m_operatorController.povUp().getAsBoolean()) {
-     * m_ClimberSubsystem.UpMotor();
-     * } else if (m_operatorController.povDown().getAsBoolean()) {
-     * m_ClimberSubsystem.DownMotor();
-     * } else {
-     * m_ClimberSubsystem.StopMotor();
-     * }
-     */
+    
+m_operatorController.povUp()
+        .onTrue(new RunCommand(() -> m_ClimberSubsystem.UpClimb(), m_ClimberSubsystem))
+        .onFalse(new RunCommand(() -> m_ClimberSubsystem.StopClimb(), m_ClimberSubsystem)); 
+m_operatorController.povDown()
+        .onTrue(new RunCommand(() -> m_ClimberSubsystem.DownClimb(), m_ClimberSubsystem))
+        .onFalse(new RunCommand(() -> m_ClimberSubsystem.StopClimb(), m_ClimberSubsystem));
+
+
+
+  
 
     // Intake control
-    if (m_operatorController.rightTrigger().getAsBoolean()) {
-      m_IntakeSubsystem.StartIntake();
-    } else if (m_operatorController.rightBumper().getAsBoolean()) {
-      m_IntakeSubsystem.ReverseIntake();
-    } else {
-      m_IntakeSubsystem.StopIntake();
-    }
 
-    // Agitator control
-    if (m_operatorController.leftTrigger().getAsBoolean()) {
-      m_AgitatorSubsystem.StartAgitator();
-    } else if (m_operatorController.leftBumper().getAsBoolean()) {
-      m_AgitatorSubsystem.ReverseAgitator();
-    } else {
-      m_AgitatorSubsystem.StopAgitator();
-    }
+m_operatorController.rightTrigger()
+        .onTrue(m_IntakeSubsystem.StartIntake())
+        .onFalse(m_IntakeSubsystem.StopIntake());
+
+     m_operatorController.rightBumper()
+        .onTrue(m_IntakeSubsystem.ReverseIntake())
+        .onFalse(m_IntakeSubsystem.StopIntake());
+
+
+
+m_operatorController.leftTrigger()
+        .onTrue(m_AgitatorSubsystem.StartAgitator())
+        .onFalse(m_AgitatorSubsystem.StopAgitator());
+
+     m_operatorController.leftBumper()
+        .onTrue(m_AgitatorSubsystem.ReverseAgitator())
+        .onFalse(m_AgitatorSubsystem.StopAgitator());
+
+
+
+
 
   }
 

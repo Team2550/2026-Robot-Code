@@ -34,9 +34,6 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // Initial values on dashboard
-    SmartDashboard.putNumber("Shooter Speed", Constants.MotorSpeeds.MaxShooterSpeed);
-    SmartDashboard.putBoolean("Drive Mode", true); // true = arcade, false = tank
   }
 
   /**

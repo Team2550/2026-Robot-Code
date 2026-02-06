@@ -47,7 +47,8 @@ public final class Constants {
     }
 
     public static final class MotorSpeeds {
-        public static final double MaxShooterSpeed = 55.00;// Shooter = 55%
+        public static final double MaxShooterSpeedOut = 55.00;// Shooter = 55%
+        public static final double MaxShooterSpeedIn = -8.00; // Shooter = 8%
         public static final double MaxIntakeSpeed = 0.40; // IntakeSpeed = 40%
         public static final double MaxAgitatorSpeed = 0.30; // Agitator Speed = 30%
         public static final double ClimberSpeed = 0.10; // Climber Speed = 10%
