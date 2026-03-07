@@ -21,6 +21,7 @@ import com.pathplanner.lib.controllers.PPLTVController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
@@ -29,10 +30,11 @@ import frc.robot.subsystems.PhotonVision;
 import java.util.Optional;
 
 import com.ctre.phoenix6.hardware.Pigeon2; //Gyro
+import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 
 public class DriveSubsystem extends SubsystemBase {
 
-
+private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.546);
 
     private final Field2d field = new Field2d();
 
@@ -56,6 +58,8 @@ public class DriveSubsystem extends SubsystemBase {
     double leftPos = 0;
     double rightPos = 0;
     double rightDis = 0;
+    double leftPosition = 0;
+    double rightPosition = 0;
     double wheelCircumference = Math.PI * 0.2032; // 8 inch diameter in meters
 
     private final MotorControllerGroup leftGroup = new MotorControllerGroup(leftMaster, leftFollower);
@@ -91,7 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
                     this::getPose,
                     this::resetPose,
                     this::getRobotRelativeSpeeds,
-                    (speeds, feedforwards) -> driveRobotRelative(speeds),
+                    this::driveRobotRelative,
                     new PPLTVController(0.02),
                     config,
                     () -> {
@@ -153,26 +157,28 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void resetPose(Pose2d pose) {
-        currentPose = pose;
+        m_poseEstimator.resetPosition(
+            pigeon.getRotation2d(),
+            leftEncoder.getPosition() / 8.45 * wheelCircumference,
+            rightEncoder.getPosition() / 8.45 * wheelCircumference,
+            pose
+        );
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds() {
 
-        Double yaw = pigeon.getYaw().getValueAsDouble();
-        double yawRateRadPerSec = Math.toRadians(yaw);
-        double averageSpeed = ((leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2.0)
-                * (wheelCircumference / 8.45 / 60.0);
+    var wheelSpeeds = new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity()  / 8.45 * wheelCircumference / 60, rightEncoder.getVelocity()  / 8.45 * wheelCircumference / 60);
         
-        return new ChassisSpeeds(averageSpeed, 0, yawRateRadPerSec);
-        // Vy is 0 because we are only doing differential drive, so we can't move
-        // sideways. Vx is the speed of our drive train, omega is the rate of rotation
-        // from the gyro.
+        return kinematics.toChassisSpeeds(wheelSpeeds);
     }
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
-        drive.arcadeDrive(
-                speeds.vxMetersPerSecond,
-                speeds.omegaRadiansPerSecond);
+       DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speeds);
+
+       double leftPer = wheelSpeeds.leftMetersPerSecond;
+        double rightPer = wheelSpeeds.rightMetersPerSecond;
+        drive.tankDrive(leftPer, rightPer);
+        drive.feed();
     }
 
     public Command resetPigeon() {
@@ -205,8 +211,8 @@ public class DriveSubsystem extends SubsystemBase {
         m_poseEstimator.update(
                 pigeon.getRotation2d(), leftDis, rightDis);
 
-        double leftPosition = leftPos - leftEncoder.getPosition() / 8.45 * wheelCircumference;
-        double rightPosition = rightPos - rightEncoder.getPosition() / 8.45 * wheelCircumference;
+         leftPosition = leftPos - leftEncoder.getPosition() / 8.45 * wheelCircumference;
+         rightPosition = rightPos - rightEncoder.getPosition() / 8.45 * wheelCircumference;
         leftPos = leftEncoder.getPosition() / 8.45 * wheelCircumference;
         rightPos = rightEncoder.getPosition() / 8.45 * wheelCircumference;
 
