@@ -8,8 +8,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj.DriverStation;
-
+//import frc.robot.subsystems.PhotonVision;
 /**
  * The methods in this class are called automatically corresponding to each
  * mode, as described in
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private final RobotContainer m_robotContainer;
+  //private final PhotonVision m_PhotonVision;
 
   // Added fields
 
@@ -33,6 +35,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+   // this.m_PhotonVision = vision;
 
   }
 
@@ -92,6 +95,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+   //   m_PhotonVision.AimShoot();
   }
 
   @Override

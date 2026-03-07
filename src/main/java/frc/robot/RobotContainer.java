@@ -43,7 +43,7 @@ public class RobotContainer {
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   private final AgitatorSubsystem m_AgitatorSubsystem = new AgitatorSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final PhotonVision m_photonVision = new PhotonVision(m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem);
+  private final PhotonVision m_photonVision = new PhotonVision(m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem, m_ClimberSubsystem);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(Driver.kJoystickID);
@@ -116,6 +116,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake_OFF", m_IntakeSubsystem.StopIntake());
     NamedCommands.registerCommand("Agitator_ON", m_AgitatorSubsystem.StartAgitator());
     NamedCommands.registerCommand("Agitator_OFF", m_AgitatorSubsystem.StopAgitator());
+    NamedCommands.registerCommand("AutoAlignShoot", m_photonVision.AimShoot());
   };
 
   private void configureBindings() {
@@ -134,6 +135,10 @@ public class RobotContainer {
         .onTrue(m_ClimberSubsystem.OverDown())
 
         .onFalse(m_ClimberSubsystem.StopClimb());
+    //Auto climb
+    m_operatorController.povLeft()
+      .onTrue(m_photonVision.ClimbFalse())
+      .whileTrue(m_photonVision.AimClimb());
 
     // Climber Up All the way
     m_operatorController.povUp()
