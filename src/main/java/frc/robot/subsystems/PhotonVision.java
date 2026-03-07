@@ -17,7 +17,7 @@ import frc.robot.Constants.Subsystems.Shooter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.MathUtil;
-
+import edu.wpi.first.wpilibj.Timer;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 // PhotonVision imports
@@ -46,7 +46,10 @@ public class PhotonVision extends SubsystemBase {
   double distanceToTarget;
   double climbDistanceToTarget;
   double rotaioionSpeed;
+  double time = 0;
   boolean climbFirst = false;
+  private final Timer timer = new Timer();
+
 
   /**
    * Construct PhotonVision with shared subsystem references.
@@ -190,6 +193,83 @@ public class PhotonVision extends SubsystemBase {
 
     }, m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem);
   }
+
+
+
+
+  public Command AimShootAuto() {
+    timer.reset();
+    timer.start();
+    return new RunCommand(() -> {
+
+  
+          
+          RunCamera();
+          double distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+              Constants.Subsystems.Vision.kHubPoseBlue);
+          Rotation2d targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(),
+              Constants.Subsystems.Vision.kHubPoseBlue);
+
+          var allianceOptional = DriverStation.getAlliance();
+          DriverStation.Alliance alliance = allianceOptional.get();
+
+          if (alliance == DriverStation.Alliance.Red) {
+            // Distance
+            distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+                Constants.Subsystems.Vision.kHubPoseRed);
+            // Rotation
+            targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(), Constants.Subsystems.Vision.kHubPoseRed);
+
+          } else if (alliance == DriverStation.Alliance.Blue) {
+            // Distance
+            distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+                Constants.Subsystems.Vision.kHubPoseBlue);
+    
+            // Rotation
+            targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(), Constants.Subsystems.Vision.kHubPoseBlue);
+          } else {
+            System.out.println("Error loading Allance color");
+          }
+
+          System.out.println("Yaw" + targetYaw.getDegrees());
+          double rotaioionSpeed = turnPID.calculate(targetYaw.getDegrees(), Constants.Subsystems.Vision.kYawTarget);
+
+          double driveSpeed = drivePID.calculate(distanceToTarget, Constants.Subsystems.Vision.kDistanceTarget);
+  
+
+          // Clamp to safty range
+          rotaioionSpeed = MathUtil.clamp(rotaioionSpeed, -0.7,
+             0.7);
+          driveSpeed = MathUtil.clamp(driveSpeed, -1,
+              1);
+
+                  
+          if (!turnPID.atSetpoint()) {
+            m_driveSubsystem.arcadeDrive(0, rotaioionSpeed);
+          } else {
+            m_driveSubsystem.arcadeDrive(driveSpeed, 0);
+          }
+
+          System.out.println("Turn: " + turnPID.atSetpoint() + "Drive" + drivePID.atSetpoint());
+          if (turnPID.atSetpoint() && drivePID.atSetpoint()) {
+            m_driveSubsystem.arcadeDrive(0, 0);
+            m_ShooterSubsystem.StartShootVoid();
+            m_AgitatorSubsystem.StartAgitatorVoid();
+            System.out.println("Shooting");
+            m_IntakeSubsystem.StartIntakeVoid();
+          } 
+
+
+    }, this).until(() -> timer.hasElapsed(5))
+    .finallyDo(() ->  {
+      m_ShooterSubsystem.StopShoot();
+      m_IntakeSubsystem.StopIntake();
+      m_AgitatorSubsystem.StopAgitator();
+      m_driveSubsystem.arcadeDrive(0, 0);
+    });
+  }
+
+
 
 
 

@@ -7,8 +7,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Timer;
 
 // For CAN
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -23,6 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private SparkMax IntakeMotor = new SparkMax(Constants.Subsystems.Intake.kIntakePort, MotorType.kBrushless);
   private final RelativeEncoder intakeEncoder = IntakeMotor.getEncoder();
     PIDController speedPID = new PIDController(0.0008, 0.0005, 0.00005);
+    private Timer timer = new Timer();
 
   public IntakeSubsystem() {
     
@@ -61,12 +64,24 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command StartIntake() {
-    return this.run(() -> {
+    return new RunCommand(() -> {
                 double intake = speedPID.calculate(intakeEncoder.getVelocity(), 900);
       IntakeMotor.set(intake);
     });
   }
 
+
+    public Command StartIntakeAuto() {
+      timer.reset();
+      timer.start();
+    return new RunCommand(() -> {
+                double intake = speedPID.calculate(intakeEncoder.getVelocity(), 900);
+      IntakeMotor.set(intake);
+    }, this).until(()-> timer.hasElapsed(5))
+    .finallyDo(() -> {
+        IntakeMotor.set(0);
+    });
+  }
 
   public void StartIntakeVoid(){
       IntakeMotor.set(Constants.Subsystems.Intake.kMaxIntakeSpeed);
