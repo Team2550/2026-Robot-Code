@@ -58,12 +58,8 @@ public class Robot extends TimedRobot {
 
     // If FMS is not connected, this may return -1
     if (timeRemaining >= 0) {
-      int minutes = (int) timeRemaining / 60;
-      int seconds = (int) timeRemaining % 60;
-      SmartDashboard.putString("Match Time", String.format("%d:%02d", minutes, seconds));
-    } else {
-      SmartDashboard.putString("Match Time", "N/A");
-    }
+      SmartDashboard.putNumber("Match Time", timeRemaining);
+    } 
 
   }
 
@@ -113,12 +109,20 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
       m_driveForwardCommand.cancel();
     }
+    
 
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+      // Get match time from DriverStation
+    double timeRemaining = DriverStation.getMatchTime();
+
+    // If FMS is not connected, this may return -1
+    if (timeRemaining >= 0) {
+      SmartDashboard.putNumber("Match Time", timeRemaining);
+    } 
 
   }
 

@@ -43,13 +43,15 @@ public class RobotContainer {
   private final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
   private final AgitatorSubsystem m_AgitatorSubsystem = new AgitatorSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final PhotonVision m_photonVision = new PhotonVision(m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem, m_ClimberSubsystem);
- 
+  private final PhotonVision m_photonVision = new PhotonVision(m_driveSubsystem, m_ShooterSubsystem,
+      m_AgitatorSubsystem, m_IntakeSubsystem, m_ClimberSubsystem);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(Driver.kJoystickID);
   private final CommandXboxController m_operatorController = new CommandXboxController(Operator.kJoystickID);
   private final SendableChooser<Command> autoChooser;
+  private Boolean back = false;
+  double fwd;
 
   // Drive mode: false = tank, true = arcade (Default)
 
@@ -57,7 +59,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -71,8 +72,9 @@ public class RobotContainer {
             () -> {
               if (m_arcade) {
                 double rot = applyDeadbandAndScale(m_driverController.getRightX());
-                double fwd = applyDeadbandAndScale(m_driverController.getLeftY());
-
+            
+                  fwd = applyDeadbandAndScale(m_driverController.getLeftY());
+                
                 // arcadeDrive expects (fwd, rot)
                 m_driveSubsystem.arcadeDrive(fwd, rot);
               } else {
@@ -86,6 +88,8 @@ public class RobotContainer {
 
     // Toggle drive mode -- false = tank, true = arcade
     SmartDashboard.putData("Toggle Drive Mode", new InstantCommand(() -> m_arcade = !m_arcade));
+  
+    SmartDashboard.putBoolean("Drive Direction", back);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -103,7 +107,9 @@ public class RobotContainer {
       return 0.0;
     }
 
-    return Math.copySign(Math.abs(value - Constants.Subsystems.Drive.kStickDeadband) / (1.0 - Constants.Subsystems.Drive.kStickDeadband) * speed,
+    return Math.copySign(
+        Math.abs(value - Constants.Subsystems.Drive.kStickDeadband) / (1.0 - Constants.Subsystems.Drive.kStickDeadband)
+            * speed,
         value);
   }
 
@@ -124,19 +130,21 @@ public class RobotContainer {
     // Shooter control
     m_driverController.rightBumper()
         .onTrue(m_photonVision.AimShoot());
-       
+
+    
 
     // Start Shooter (constant speed)
     m_driverController.rightTrigger()
-        .onTrue(Commands.parallel(m_ShooterSubsystem.StartShoot(), m_AgitatorSubsystem.StartAgitator(), m_IntakeSubsystem.StartIntake()));
-      
+        .onTrue(Commands.parallel(m_ShooterSubsystem.StartShoot(), m_AgitatorSubsystem.StartAgitator(),
+            m_IntakeSubsystem.StartIntake()));
 
-        // m_operatorController.b()
-        //  .whileTrue(m_photonVision.AimClimb())
-        //  .onFalse(m_photonVision.resetClimb());
+    // m_operatorController.b()
+    // .whileTrue(m_photonVision.AimClimb())
+    // .onFalse(m_photonVision.resetClimb());
 
-m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
-  .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator(), m_IntakeSubsystem.StopIntake()));
+    m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
+        .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator(),
+            m_IntakeSubsystem.StopIntake()));
 
     // Climber control
     m_operatorController.a()
@@ -148,10 +156,9 @@ m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().
     m_operatorController.povUp()
         .onTrue(m_ClimberSubsystem.UpClimb());
 
-
-    //Gyro zero
+    // Gyro zero
     m_operatorController.y()
-      .onTrue(m_driveSubsystem.resetPigeon());
+        .onTrue(m_driveSubsystem.resetPigeon());
 
     // Climber Down All the way
     m_operatorController.povDown()
@@ -167,10 +174,6 @@ m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().
         .onTrue(m_IntakeSubsystem.StartIntake())
         .onFalse(m_IntakeSubsystem.StopIntake());
 
-
-
-
-
   }
 
   /**
@@ -183,7 +186,8 @@ m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().
     // An example command will be run in autonomous
     return m_photonVision.AimShoot();
   }
-    public Command DriveForwardCommand() {
+
+  public Command DriveForwardCommand() {
     // An example command will be run in autonomous
     return m_driveSubsystem.DriveForward();
   }

@@ -110,15 +110,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void arcadeDrive(double fwd, double rot) {
-        // if (Math.abs(fwd) > 0.05 && Math.abs(rot) < 0.05) {
-        // // double correction = leftEncoder.getVelocity() - rightEncoder.getVelocity()
-        // * 0.00001;
-        // // drive.arcadeDrive(fwd, -correction);
-        // // return;
-        // } else {
-        // Normal arcade drive
         drive.arcadeDrive(fwd, rot);
-        // }
     }
 
 
@@ -170,8 +162,6 @@ public class DriveSubsystem extends SubsystemBase {
         double yawRateRadPerSec = Math.toRadians(yaw);
         double averageSpeed = ((leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2.0)
                 * (wheelCircumference / 8.45 / 60.0);
-        DifferentialDriveWheelSpeeds speeds = new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(),
-                rightEncoder.getVelocity());
         return new ChassisSpeeds(averageSpeed, 0, yawRateRadPerSec);
         // Vy is 0 because we are only doing differential drive, so we can't move
         // sideways. Vx is the speed of our drive train, omega is the rate of rotation
