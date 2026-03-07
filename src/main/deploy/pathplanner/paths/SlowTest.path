@@ -8,20 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.978464285714285,
-        "y": 4.002607142857143
+        "x": 7.706421351344683,
+        "y": 4.176094281767308
       },
       "isLocked": false,
       "linkedName": "End of Forward Auto"
     },
     {
       "anchor": {
-        "x": 7.395392857142857,
-        "y": 4.018803571428571
+        "x": 7.168642857142856,
+        "y": 4.4075178571428575
       },
       "prevControl": {
-        "x": 7.978464285714285,
-        "y": 3.9864107142857144
+        "x": 7.3534973286165055,
+        "y": 4.133920964272222
+      },
+      "nextControl": {
+        "x": 6.9205015657489035,
+        "y": 4.774783445998092
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.865089285714285,
+        "y": 5.557464285714286
+      },
+      "prevControl": {
+        "x": 7.193772118780629,
+        "y": 5.249681858835492
       },
       "nextControl": null,
       "isLocked": false,
@@ -44,7 +60,7 @@
     "velocity": 0,
     "rotation": 0.0
   },
-  "reversed": false,
+  "reversed": true,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,

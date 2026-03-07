@@ -21,16 +21,11 @@ import com.pathplanner.lib.controllers.PPLTVController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
-import frc.robot.subsystems.PhotonVision;
 
-import java.util.Optional;
 
 import com.ctre.phoenix6.hardware.Pigeon2; //Gyro
-import com.ctre.phoenix6.swerve.utility.WheelForceCalculator.Feedforwards;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -95,7 +90,7 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
                     this::getPose,
                     this::resetPose,
                     this::getRobotRelativeSpeeds,
-                    this::driveRobotRelative,
+                    (speeds, feeedforwards) -> driveRobotRelative(speeds),
                     new PPLTVController(0.02),
                     config,
                     () -> {
@@ -159,8 +154,8 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     public void resetPose(Pose2d pose) {
         m_poseEstimator.resetPosition(
             pigeon.getRotation2d(),
-            leftEncoder.getPosition() / 8.45 * wheelCircumference,
-            rightEncoder.getPosition() / 8.45 * wheelCircumference,
+            leftEncoder.getPosition(),
+            rightEncoder.getPosition(),
             pose
         );
     }
@@ -172,12 +167,15 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         return kinematics.toChassisSpeeds(wheelSpeeds);
     }
 
-    public void driveRobotRelative(ChassisSpeeds speeds) {
-       DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speeds);
 
-       double leftPer = wheelSpeeds.leftMetersPerSecond;
-        double rightPer = wheelSpeeds.rightMetersPerSecond;
-        drive.tankDrive(leftPer, rightPer);
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+       DifferentialDriveWheelSpeeds wheelSpeedsDrive = kinematics.toWheelSpeeds(speeds);
+
+       double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7;
+       
+        double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7;
+        
+        drive.tankDrive(-leftPer, -rightPer);
         drive.feed();
     }
 
@@ -189,6 +187,31 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         });
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // public Command driveForward(){
     // if ()
