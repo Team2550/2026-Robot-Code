@@ -149,7 +149,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        return currentPose;
+        return get2dPose();
     }
 
     public void resetPose(Pose2d pose) {
@@ -162,6 +162,7 @@ public class DriveSubsystem extends SubsystemBase {
         double yawRateRadPerSec = Math.toRadians(yaw);
         double averageSpeed = ((leftEncoder.getVelocity() + rightEncoder.getVelocity()) / 2.0)
                 * (wheelCircumference / 8.45 / 60.0);
+        
         return new ChassisSpeeds(averageSpeed, 0, yawRateRadPerSec);
         // Vy is 0 because we are only doing differential drive, so we can't move
         // sideways. Vx is the speed of our drive train, omega is the rate of rotation

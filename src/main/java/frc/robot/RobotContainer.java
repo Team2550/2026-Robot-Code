@@ -189,6 +189,6 @@ public class RobotContainer {
 
   public Command DriveForwardCommand() {
     // An example command will be run in autonomous
-    return m_driveSubsystem.DriveForward();
+    return autoChooser.getSelected();
   }
 }
