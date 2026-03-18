@@ -50,8 +50,9 @@ public final class Constants {
 
         public static final class Shooter {
             // Ports
-            public static final int kShooter1Port = 7;
-            public static final int kShooter2Port = 0;
+            public static final int kShooterLowerPort = 7;
+            public static final int kShooterUpper1Port = 7;
+            public static final int kShooterUpper2Port = 12; //
             // Speeds
             public static final double kMaxShooterSpeedOut1 = 0.85;// Shooter =85%
             public static final double kMaxShooterSpeedOut2 = 0.76;// Shooter = 76%

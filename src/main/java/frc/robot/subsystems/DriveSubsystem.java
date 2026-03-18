@@ -86,12 +86,12 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
         try {
             RobotConfig config = RobotConfig.fromGUISettings();
-            AutoBuilder.configure(
-                    this::getPose,
-                    this::resetPose,
-                    this::getRobotRelativeSpeeds,
-                    (speeds, feeedforwards) -> driveRobotRelative(speeds),
-                    new PPLTVController(0.02),
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetPose,
+            this::getRobotRelativeSpeeds,
+            (speeds) -> driveRobotRelative(speeds),
+            new PPLTVController(0.02),
                     config,
                     () -> {
                         var alliance = DriverStation.getAlliance();
@@ -122,8 +122,7 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         return new RunCommand(() -> {
             if (leftDis < 0.3 && !back) {
                 drive.arcadeDrive(-1, 0);
-                SmartDashboard.putNumber("Dis", leftDis);
-            } else if (leftDis > -0.3) {
+                        } else if (leftDis > -0.3) {
                   back = true;
                 drive.arcadeDrive(1, 0);
 
@@ -152,31 +151,56 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     }
 
     public void resetPose(Pose2d pose) {
+        // Convert encoder positions (rotations) to meters before resetting the
+        // pose estimator. Encoders return rotations for REV relative encoders
+        // by default; divide by the gear ratio and multiply by wheel
+        // circumference to get meters.
+        double leftMeters = leftEncoder.getPosition() / 8.45 * wheelCircumference;
+        double rightMeters = rightEncoder.getPosition() / 8.45 * wheelCircumference;
+
         m_poseEstimator.resetPosition(
             pigeon.getRotation2d(),
-            leftEncoder.getPosition(),
-            rightEncoder.getPosition(),
+            leftMeters,
+            rightMeters,
             pose
         );
     }
 
+    // PathPlanner expects a supplier of chassis speeds (robot-relative velocities) for
+    // its AutoBuilder. Return ChassisSpeeds here.
     public ChassisSpeeds getRobotRelativeSpeeds() {
 
-    var wheelSpeeds = new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity()  / 8.45 * wheelCircumference / 60, rightEncoder.getVelocity()  / 8.45 * wheelCircumference / 60);
-        
+        // Encoders return RPM for REV relative encoders by default; convert to
+        // meters per second: (rotations per minute) / 60 = rotations per second;
+        // multiply by wheel circumference, divide by gear ratio (8.45)
+        double leftMPS = leftEncoder.getVelocity() / 8.45 * wheelCircumference / 60.0;
+        double rightMPS = rightEncoder.getVelocity() / 8.45 * wheelCircumference / 60.0;
+
+        var wheelSpeeds = new DifferentialDriveWheelSpeeds(leftMPS, rightMPS);
+
         return kinematics.toChassisSpeeds(wheelSpeeds);
     }
 
 
+    // Accept chassis speeds from PathPlanner; convert to wheel speeds and apply
+    // simple open-loop outputs (feedforward from the library is currently ignored).
     public void driveRobotRelative(ChassisSpeeds speeds) {
        DifferentialDriveWheelSpeeds wheelSpeedsDrive = kinematics.toWheelSpeeds(speeds);
 
-       double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7;
-       
-        double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7;
-        
-        drive.tankDrive(-leftPer, -rightPer);
-        drive.feed();
+    double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7.0;
+    double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7.0;
+
+     // Clamp to [-1, 1] to avoid sending invalid outputs to motors.
+     leftPer = Math.max(-1.0, Math.min(1.0, leftPer));
+     rightPer = Math.max(-1.0, Math.min(1.0, rightPer));
+
+     SmartDashboard.putNumber("leftPer", leftPer);
+     SmartDashboard.putNumber("rightPer", rightPer);
+     // Drive the motors during path following. We negate because motor
+     // inversion or drivetrain configuration may require it.
+     drive.tankDrive(-leftPer, -rightPer);
+     // Feed the watchdog for the DifferentialDrive to prevent safety timeouts.
+     drive.feed();
     }
 
     public Command resetPigeon() {

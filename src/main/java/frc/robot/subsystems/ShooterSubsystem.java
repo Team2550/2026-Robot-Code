@@ -14,20 +14,28 @@ import edu.wpi.first.math.controller.PIDController;
 // For CAN
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkClosedLoopController;
 
-// For PWM
-import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
+//For kracken
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+
+
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private SparkMax Shooter1Motor = new SparkMax(Constants.Subsystems.Shooter.kShooter1Port, MotorType.kBrushless);
-  private PWMVictorSPX Shooter2Motor = new PWMVictorSPX(Constants.Subsystems.Shooter.kShooter2Port);
-  private final RelativeEncoder ShooterEncoder = Shooter1Motor.getEncoder();
-    PIDController shooterPID = new PIDController(0.00027, 0.00017, 0.000017);
+  private SparkMax ShooterUpper1Motor = new SparkMax(Constants.Subsystems.Shooter.kShooterUpper1Port, MotorType.kBrushless);
+  private SparkMax ShooterUpper2Motor = new SparkMax(Constants.Subsystems.Shooter.kShooterUpper2Port, MotorType.kBrushless);
+  private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Climber.kClimberPort);
 
+  private final RelativeEncoder ShooterUpperEncoder = ShooterUpper1Motor.getEncoder();
+    PIDController shooterPID = new PIDController(0.00027, 0.00017, 0.000017);
+    private final DutyCycleOut percentOutput = new DutyCycleOut(0);
 
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
@@ -64,29 +72,31 @@ public class ShooterSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    SmartDashboard.putNumber("Shooter RPM", ShooterEncoder.getVelocity());
+    SmartDashboard.putNumber("Shooter RPM", ShooterUpperEncoder.getVelocity());
 
   }
 
   public Command StartShoot() {
     return this.run(() -> {
 
-         double shooter = shooterPID.calculate(ShooterEncoder.getVelocity(), 5000);
+         double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 5000);
       
 
-            Shooter1Motor.set(shooter);
-      if (ShooterEncoder.getVelocity() > 4000){
-              Shooter2Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut2);
+            ShooterUpper1Motor.set(shooter);
+            ShooterUpper2Motor.set(-shooter);
+      if (ShooterUpperEncoder.getVelocity() > 4000){
+              shooterLowerMotor.setControl(percentOutput.withOutput(0.6));
   }});
   }
 
   public void StartShootVoid(){
 
-      double shooter = shooterPID.calculate(ShooterEncoder.getVelocity(), 5000);
-            Shooter1Motor.set(shooter);
-      if (ShooterEncoder.getVelocity() > 2000){
-              Shooter2Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut2);
-  }  }
+      double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 5000);
+                ShooterUpper1Motor.set(shooter);
+            ShooterUpper2Motor.set(-shooter);
+      if (ShooterUpperEncoder.getVelocity() > 4000){
+              shooterLowerMotor.setControl(percentOutput.withOutput(0.6));
+             }}
 
 
 
@@ -95,9 +105,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     
 
-            Shooter1Motor.set(0);
+            ShooterUpper1Motor.set(0);
+            ShooterUpper2Motor.set(0);
     
-              Shooter2Motor.set(0);
+              shooterLowerMotor.setControl(percentOutput.withOutput(0.0));
          
   });
   }

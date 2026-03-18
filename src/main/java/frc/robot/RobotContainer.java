@@ -119,7 +119,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot_1", m_ShooterSubsystem.StartShoot());
     NamedCommands.registerCommand("Climb_UP", m_ClimberSubsystem.UpClimb());
     NamedCommands.registerCommand("Climb_DOWN", m_ClimberSubsystem.DownClimb());
-    NamedCommands.registerCommand("Intake_ON_5", m_IntakeSubsystem.StartIntakeAuto());
+    NamedCommands.registerCommand("Intake_ON", m_IntakeSubsystem.StartIntake());
     NamedCommands.registerCommand("Intake_OFF", m_IntakeSubsystem.StopIntake());
     NamedCommands.registerCommand("Agitator_ON", m_AgitatorSubsystem.StartAgitator());
     NamedCommands.registerCommand("Agitator_OFF", m_AgitatorSubsystem.StopAgitator());

@@ -17,15 +17,17 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-// For PWM
-//import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+//Kracken 
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private SparkMax IntakeMotor = new SparkMax(Constants.Subsystems.Intake.kIntakePort, MotorType.kBrushless);
-  private final RelativeEncoder intakeEncoder = IntakeMotor.getEncoder();
+  private TalonFX IntakeMotor = new TalonFX(Constants.Subsystems.Intake.kIntakePort);
     PIDController speedPID = new PIDController(0.0008, 0.0005, 0.00005);
     private Timer timer = new Timer();
+      private final DutyCycleOut percentOutput = new DutyCycleOut(0);
 
   public IntakeSubsystem() {
     
@@ -60,13 +62,13 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Intake", intakeEncoder.getVelocity());
+    SmartDashboard.putNumber("Intake", IntakeMotor.getVelocity().getValueAsDouble());
   }
 
   public Command StartIntake() {
     return new RunCommand(() -> {
-                double intake = speedPID.calculate(intakeEncoder.getVelocity(), 900);
-      IntakeMotor.set(intake);
+                double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
+      IntakeMotor.setControl(percentOutput.withOutput(intake));
     });
   }
 
@@ -75,29 +77,31 @@ public class IntakeSubsystem extends SubsystemBase {
       timer.reset();
       timer.start();
     return new RunCommand(() -> {
-                double intake = speedPID.calculate(intakeEncoder.getVelocity(), 900);
-      IntakeMotor.set(intake);
+                double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
+      IntakeMotor.setControl(percentOutput.withOutput(intake));
     }, this).until(()-> timer.hasElapsed(5))
     .finallyDo(() -> {
-        IntakeMotor.set(0);
+      IntakeMotor.setControl(percentOutput.withOutput(0));
     });
   }
 
   public void StartIntakeVoid(){
-      IntakeMotor.set(Constants.Subsystems.Intake.kMaxIntakeSpeed);
-  }
+double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
+      IntakeMotor.setControl(percentOutput.withOutput(intake));
+      }
 
 
 
   public Command ReverseIntake() {
     return this.run(() -> {
-      IntakeMotor.set(-Constants.Subsystems.Intake.kMaxIntakeSpeed);
+double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), -900);
+      IntakeMotor.setControl(percentOutput.withOutput(intake));    
     });
   }
 
   public Command StopIntake() {
     return this.run(() -> {
-      IntakeMotor.set(0);
+      IntakeMotor.setControl(percentOutput.withOutput(0));    
     });
   }
 
