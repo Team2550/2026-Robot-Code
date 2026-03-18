@@ -60,10 +60,12 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+
+        // Configure the trigger bindings
+    registerNamedCommands();
     autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Configure the trigger bindings
-    registerNamedCommands();
+
     configureBindings();
     // drive command
     // if (!remoteOperated) {

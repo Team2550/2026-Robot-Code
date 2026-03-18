@@ -25,12 +25,11 @@ import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.*;
 
-
 import com.ctre.phoenix6.hardware.Pigeon2; //Gyro
 
 public class DriveSubsystem extends SubsystemBase {
 
-private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.546);
+    private final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(0.546);
 
     private final Field2d field = new Field2d();
 
@@ -63,8 +62,6 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
     private final DifferentialDrive drive = new DifferentialDrive(leftGroup, rightGroup);
 
-    private Pose2d currentPose = new Pose2d();
-
     private final DifferentialDrivePoseEstimator m_poseEstimator = new DifferentialDrivePoseEstimator(
             Constants.Subsystems.Drive.kinematics,
             pigeon.getRotation2d(),
@@ -76,7 +73,6 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
     public DriveSubsystem() {
 
-
         SmartDashboard.putData("Field", field);
         leftMaster.setInverted(true);
         leftFollower.setInverted(true);
@@ -87,12 +83,12 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
         try {
             RobotConfig config = RobotConfig.fromGUISettings();
-        AutoBuilder.configure(
-            this::getPose,
-            this::resetPose,
-            this::getRobotRelativeSpeeds,
-            (speeds) -> driveRobotRelative(speeds),
-            new PPLTVController(0.02),
+            AutoBuilder.configure(
+                    this::getPose,
+                    this::resetPose,
+                    this::getRobotRelativeSpeeds,
+                    (speeds) -> driveRobotRelative(speeds),
+                    new PPLTVController(0.02),
                     config,
                     () -> {
                         var alliance = DriverStation.getAlliance();
@@ -112,8 +108,6 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     public void arcadeDrive(double fwd, double rot) {
         drive.arcadeDrive(fwd, rot);
     }
-    
-
 
     public Command DriveForward() {
         leftDis = 0;
@@ -123,20 +117,19 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         return new RunCommand(() -> {
             if (leftDis < 0.3 && !back) {
                 drive.arcadeDrive(-1, 0);
-                        } else if (leftDis > -0.3) {
-                  back = true;
+            } else if (leftDis > -0.3) {
+                back = true;
                 drive.arcadeDrive(1, 0);
 
             } else {
-              
+
                 drive.arcadeDrive(0, 0);
                 done = true;
-               
-               
+
             }
-                
+
         }, this).until(() -> done);
-       
+
     }
 
     public void tankDrive(double left, double right) {
@@ -152,10 +145,11 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     }
 
     public void resetPose(Pose2d pose) {
-        //Photon vision should do this for us
+        // Photon vision should do this for us
     }
 
-    // PathPlanner expects a supplier of chassis speeds (robot-relative velocities) for
+    // PathPlanner expects a supplier of chassis speeds (robot-relative velocities)
+    // for
     // its AutoBuilder. Return ChassisSpeeds here.
     public ChassisSpeeds getRobotRelativeSpeeds() {
 
@@ -170,29 +164,28 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         return kinematics.toChassisSpeeds(wheelSpeeds);
     }
 
-
     // Accept chassis speeds from PathPlanner; convert to wheel speeds and apply
     // simple open-loop outputs (feedforward from the library is currently ignored).
     public void driveRobotRelative(ChassisSpeeds speeds) {
-       DifferentialDriveWheelSpeeds wheelSpeedsDrive = kinematics.toWheelSpeeds(speeds);
+        DifferentialDriveWheelSpeeds wheelSpeedsDrive = kinematics.toWheelSpeeds(speeds);
 
-    double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7.0;
-    double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7.0;
+        double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7.0;
+        double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7.0;
 
-     SmartDashboard.putNumber("leftPer", leftPer);
-     SmartDashboard.putNumber("rightPer", rightPer);
+        SmartDashboard.putNumber("leftPer", leftPer);
+        SmartDashboard.putNumber("rightPer", rightPer);
 
-     // Clamp to [-1, 1] to avoid sending invalid outputs to motors.
-     leftPer = Math.max(-1.0, Math.min(1.0, leftPer));
-     rightPer = Math.max(-1.0, Math.min(1.0, rightPer));
+        // Clamp to [-1, 1] to avoid sending invalid outputs to motors.
+        leftPer = Math.max(-1.0, Math.min(1.0, leftPer));
+        rightPer = Math.max(-1.0, Math.min(1.0, rightPer));
 
-     SmartDashboard.putNumber("leftPerClamp", leftPer);
-     SmartDashboard.putNumber("rightPerClamp", rightPer);
-     // Drive the motors during path following. We negate because motor
-     // inversion or drivetrain configuration may require it.
-     drive.tankDrive(-leftPer, -rightPer);
-     // Feed the watchdog for the DifferentialDrive to prevent safety timeouts.
-     drive.feed();
+        SmartDashboard.putNumber("leftPerClamp", leftPer);
+        SmartDashboard.putNumber("rightPerClamp", rightPer);
+        // Drive the motors during path following. We negate because motor
+        // inversion or drivetrain configuration may require it.
+        drive.tankDrive(-leftPer, -rightPer);
+        // Feed the watchdog for the DifferentialDrive to prevent safety timeouts.
+        drive.feed();
     }
 
     public Command resetPigeon() {
@@ -203,31 +196,6 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         });
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // public Command driveForward(){
     // if ()
@@ -246,18 +214,24 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
     @Override
     public void periodic() {
-        // Put periodic subsystem code here (telemetry, safety checks)
-        m_poseEstimator.update(
-                pigeon.getRotation2d(), leftDis, rightDis);
+        // Convert encoder positions to meters (absolute)
+        double leftMeters = leftEncoder.getPosition() / 8.45 * wheelCircumference;
+        double rightMeters = rightEncoder.getPosition() / 8.45 * wheelCircumference;
 
-         leftPosition = leftPos - leftEncoder.getPosition() / 8.45 * wheelCircumference;
-         rightPosition = rightPos - rightEncoder.getPosition() / 8.45 * wheelCircumference;
-        leftPos = leftEncoder.getPosition() / 8.45 * wheelCircumference;
-        rightPos = rightEncoder.getPosition() / 8.45 * wheelCircumference;
+        // Update pose estimator with current gyro angle and absolute wheel positions
+        m_poseEstimator.update(pigeon.getRotation2d(), leftMeters, rightMeters);
 
-        leftDis = leftDis + leftPosition;
-        rightDis = rightDis + rightPosition;
-        SmartDashboard.putNumber("Dis", rightDis);
+        SmartDashboard.putNumber("Pigeon Yaw", pigeon.getYaw().getValueAsDouble());
+
+        Pose2d pose = m_poseEstimator.getEstimatedPosition();
+        field.setRobotPose(pose);
+
+        // Telemetry
+        SmartDashboard.putNumber("LeftMeters", leftMeters);
+        SmartDashboard.putNumber("RightMeters", rightMeters);
+        SmartDashboard.putNumber("PoseX", pose.getX());
+        SmartDashboard.putNumber("PoseY", pose.getY());
+        SmartDashboard.putNumber("PoseTheta", pose.getRotation().getDegrees());
 
         boolean isHot = leftMaster.getMotorTemperature() > 50 || rightMaster.getMotorTemperature() > 50
                 || leftFollower.getMotorTemperature() > 50 || rightFollower.getMotorTemperature() > 50;
@@ -265,8 +239,5 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
 
         SmartDashboard.putNumber("Pigeon Yaw", pigeon.getYaw().getValueAsDouble());
 
-        Pose2d pose = m_poseEstimator.getEstimatedPosition();
-
-        field.setRobotPose(pose);
     }
 }

@@ -12,25 +12,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Timer;
 
-// For CAN
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 //Kracken 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private TalonFX IntakeMotor = new TalonFX(Constants.Subsystems.Intake.kIntakePort);
-    PIDController speedPID = new PIDController(0.0008, 0.0005, 0.00005);
-    private Timer timer = new Timer();
-      private final DutyCycleOut percentOutput = new DutyCycleOut(0);
+  PIDController speedPID = new PIDController(0.0008, 0.0005, 0.00005);
+  private Timer timer = new Timer();
+  private final DutyCycleOut percentOutput = new DutyCycleOut(0);
 
   public IntakeSubsystem() {
-    
 
   }
 
@@ -67,39 +60,37 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command StartIntake() {
     return new RunCommand(() -> {
-               // double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 500);
+      // double intake =
+      // speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 500);
       IntakeMotor.setControl(percentOutput.withOutput(0.4));
-    });
+    }, this);
   }
 
-
-    public Command StartIntakeAuto() {
-      timer.reset();
-      timer.start();
+  public Command StartIntakeAuto() {
+    timer.reset();
+    timer.start();
     return new RunCommand(() -> {
-                
+
       IntakeMotor.setControl(percentOutput.withOutput(0.4));
-    }, this).until(()-> timer.hasElapsed(5))
-    .finallyDo(() -> {
-      IntakeMotor.setControl(percentOutput.withOutput(0));
-    });
+    }, this).until(() -> timer.hasElapsed(5))
+        .finallyDo(() -> {
+          IntakeMotor.setControl(percentOutput.withOutput(0));
+        });
   }
 
-  public void StartIntakeVoid(){
-      IntakeMotor.setControl(percentOutput.withOutput(0.4));
-      }
-
-
+  public void StartIntakeVoid() {
+    IntakeMotor.setControl(percentOutput.withOutput(0.4));
+  }
 
   public Command ReverseIntake() {
     return this.run(() -> {
-      IntakeMotor.setControl(percentOutput.withOutput(-0.4));    
+      IntakeMotor.setControl(percentOutput.withOutput(-0.4));
     });
   }
 
   public Command StopIntake() {
     return this.run(() -> {
-      IntakeMotor.setControl(percentOutput.withOutput(0));    
+      IntakeMotor.setControl(percentOutput.withOutput(0));
     });
   }
 
