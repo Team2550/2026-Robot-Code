@@ -135,7 +135,7 @@ public class PhotonVision extends SubsystemBase {
       
     if (result.hasTargets() ) {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
-      var camera1Targets = result.getTargets().size();
+     // var camera1Targets = result.getTargets().size();
      // var camera2Targets = result2.getTargets().size();
 
 
@@ -152,8 +152,10 @@ public class PhotonVision extends SubsystemBase {
         // PhotonTrackedTarget camera2Am = result2.getBestTarget();
 
         // if (camera1Am.getPoseAmbiguity() < camera2Am.getPoseAmbiguity()){
+        if (camera1Am.getPoseAmbiguity() < 0.3){
              visionEst = photonEstimator.estimateLowestAmbiguityPose(result);  
              cameraBool = false;
+        }
         //  } else {
         //   visionEst = photonEstimator2.estimateLowestAmbiguityPose(result2);
         //   cameraBool = true;
