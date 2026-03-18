@@ -67,8 +67,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command StartIntake() {
     return new RunCommand(() -> {
-                double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
-      IntakeMotor.setControl(percentOutput.withOutput(intake));
+               // double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 500);
+      IntakeMotor.setControl(percentOutput.withOutput(0.4));
     });
   }
 
@@ -77,8 +77,8 @@ public class IntakeSubsystem extends SubsystemBase {
       timer.reset();
       timer.start();
     return new RunCommand(() -> {
-                double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
-      IntakeMotor.setControl(percentOutput.withOutput(intake));
+                
+      IntakeMotor.setControl(percentOutput.withOutput(0.4));
     }, this).until(()-> timer.hasElapsed(5))
     .finallyDo(() -> {
       IntakeMotor.setControl(percentOutput.withOutput(0));
@@ -86,16 +86,14 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void StartIntakeVoid(){
-double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), 900);
-      IntakeMotor.setControl(percentOutput.withOutput(intake));
+      IntakeMotor.setControl(percentOutput.withOutput(0.4));
       }
 
 
 
   public Command ReverseIntake() {
     return this.run(() -> {
-double intake = speedPID.calculate(IntakeMotor.getVelocity().getValueAsDouble(), -900);
-      IntakeMotor.setControl(percentOutput.withOutput(intake));    
+      IntakeMotor.setControl(percentOutput.withOutput(0.4));    
     });
   }
 

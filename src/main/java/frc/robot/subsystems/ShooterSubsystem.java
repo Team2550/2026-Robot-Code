@@ -31,7 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private SparkMax ShooterUpper1Motor = new SparkMax(Constants.Subsystems.Shooter.kShooterUpper1Port, MotorType.kBrushless);
   private SparkMax ShooterUpper2Motor = new SparkMax(Constants.Subsystems.Shooter.kShooterUpper2Port, MotorType.kBrushless);
-  private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Climber.kClimberPort);
+  private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Shooter.kShooterLowerPort);
 
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper1Motor.getEncoder();
     PIDController shooterPID = new PIDController(0.00027, 0.00017, 0.000017);
@@ -85,8 +85,9 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterUpper1Motor.set(shooter);
             ShooterUpper2Motor.set(-shooter);
       if (ShooterUpperEncoder.getVelocity() > 4000){
-              shooterLowerMotor.setControl(percentOutput.withOutput(0.6));
-  }});
+              shooterLowerMotor.setControl(percentOutput.withOutput(1));
+  }
+});
   }
 
   public void StartShootVoid(){
@@ -95,8 +96,9 @@ public class ShooterSubsystem extends SubsystemBase {
                 ShooterUpper1Motor.set(shooter);
             ShooterUpper2Motor.set(-shooter);
       if (ShooterUpperEncoder.getVelocity() > 4000){
-              shooterLowerMotor.setControl(percentOutput.withOutput(0.6));
-             }}
+              shooterLowerMotor.setControl(percentOutput.withOutput(1));
+             }
+            }
 
 
 

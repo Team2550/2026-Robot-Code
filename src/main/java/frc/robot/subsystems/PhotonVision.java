@@ -17,13 +17,24 @@ import frc.robot.Constants.Subsystems.Shooter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 // PhotonVision imports
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.PhotonPoseEstimator;
+import edu.wpi.first.math.numbers.*;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
+
+
 
 
 
@@ -49,7 +60,7 @@ public class PhotonVision extends SubsystemBase {
   double time = 0;
   boolean climbFirst = false;
   private final Timer timer = new Timer();
-
+  private Matrix<N3, N1> curStdDevs;
 
   /**
    * Construct PhotonVision with shared subsystem references.
@@ -65,6 +76,7 @@ public class PhotonVision extends SubsystemBase {
     this.m_IntakeSubsystem = intake;
     this.m_ClimberSubsystem = climb;
 
+
     camera = new PhotonCamera("MainCamera");
 
     turnPID.setTolerance(3); // degrees
@@ -75,7 +87,9 @@ public class PhotonVision extends SubsystemBase {
     photonEstimator = new PhotonPoseEstimator(
       Constants.Subsystems.Vision.kAprilTagFieldLayout,
         Constants.Subsystems.Vision.kCameraToRobot);
-  }
+ 
+ 
+      }
 
   
     
@@ -118,17 +132,77 @@ public class PhotonVision extends SubsystemBase {
       if (visionEst.isEmpty()) {
         visionEst = photonEstimator.estimateLowestAmbiguityPose(result);
       }
+      updateEstimationStdDevs(visionEst, result.getTargets());
+       
       if (visionEst.isPresent()) {
         EstimatedRobotPose estPose = visionEst.get();
         Pose3d pose3d = estPose.estimatedPose;
         Pose2d VisionEst2d = pose3d.toPose2d();
-        m_driveSubsystem.addVisionMeasurement(VisionEst2d, Timer.getFPGATimestamp());
+        
+        var estStdDevs = getEstimationStdDevs();
+        m_driveSubsystem.addVisionMeasurement(VisionEst2d, estPose.timestampSeconds, estStdDevs);
       }
     }
 
 
 
   }
+
+
+
+    private void updateEstimationStdDevs(
+            Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+        if (estimatedPose.isEmpty()) {
+            // No pose input. Default to single-tag std devs
+            curStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
+
+        } else {
+            // Pose present. Start running Heuristic
+            var estStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
+            int numTags = 0;
+            double avgDist = 0;
+
+            // Precalculation - see how many tags we found, and calculate an average-distance metric
+            for (var tgt : targets) {
+                var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+                if (tagPose.isEmpty()) continue;
+                numTags++;
+                avgDist +=
+                        tagPose
+                                .get()
+                                .toPose2d()
+                                .getTranslation()
+                                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+            }
+
+            if (numTags == 0) {
+                // No tags visible. Default to single-tag std devs
+                curStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
+            } else {
+                // One or more tags visible, run the full heuristic.
+                avgDist /= numTags;
+                // Decrease std devs if multiple targets are visible
+                if (numTags > 1) estStdDevs = Constants.Subsystems.Vision.kMultiTagStdDevs;
+                // Increase std devs based on (average) distance
+                if (numTags == 1 && avgDist > 4)
+                    estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+                curStdDevs = estStdDevs;
+            }
+        }
+    }
+
+
+
+    /**
+     * Returns the latest standard deviations of the estimated pose from {@link
+     * #getEstimatedGlobalPose()}, for use with {@link
+     * edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}. This should
+     * only be used when there are targets visible.
+     */
+    public Matrix<N3, N1> getEstimationStdDevs() {
+        return curStdDevs;
+    }
 
 
   public Command AimShoot() {

@@ -19,6 +19,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPLTVController;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -239,8 +240,8 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
         return pose;
     }
 
-    public void addVisionMeasurement(Pose2d visionPose, double timestampSeconds) {
-        m_poseEstimator.addVisionMeasurement(visionPose, timestampSeconds);
+    public void addVisionMeasurement(Pose2d visionPose, double timestampSeconds, Matrix estStdDevs) {
+        m_poseEstimator.addVisionMeasurement(visionPose, timestampSeconds, estStdDevs);
     }
 
     @Override

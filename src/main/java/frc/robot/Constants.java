@@ -7,11 +7,15 @@ package frc.robot;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.Matrix;
 
 
 
@@ -37,7 +41,7 @@ public final class Constants {
 
         public static final class Shooter {
             // Ports
-            public static final int kShooterLowerPort = 7;
+            public static final int kShooterLowerPort = 26;
             public static final int kShooterUpper1Port = 7;
             public static final int kShooterUpper2Port = 12; //
             // Speeds
@@ -60,7 +64,7 @@ public final class Constants {
 
         public static final class Intake {
             // Ports
-            public static final int kIntakePort = 12;
+            public static final int kIntakePort = 12; //12
             // Speeds
             public static final double kMaxIntakeSpeed = 0.20; // IntakeSpeed = 32%
         }
@@ -106,6 +110,9 @@ public final class Constants {
                     0.1651, // left/right camera is centered
                     0.5588, // up from floor
                     new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 0));
+
+        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
                                                                                      
         }
 
