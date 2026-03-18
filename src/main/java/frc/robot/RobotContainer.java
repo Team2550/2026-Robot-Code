@@ -176,7 +176,7 @@ public class RobotContainer {
         .onTrue(m_IntakeSubsystem.StartIntake());
 
      m_operatorController.a()
-       .onTrue(AutoBuilder.buildAuto("Climb"));
+       .whileTrue(AutoBuilder.buildAuto("Climb"));
     
 
   }
