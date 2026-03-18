@@ -115,7 +115,6 @@ public class RobotContainer {
 
   // Register named commands for use in PathPlanner autonomous paths
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("Shooter_ON_5", m_photonVision.AimShootAuto());
     NamedCommands.registerCommand("Shoot_1", m_ShooterSubsystem.StartShoot());
     NamedCommands.registerCommand("Climb_UP", m_ClimberSubsystem.UpClimb());
     NamedCommands.registerCommand("Climb_DOWN", m_ClimberSubsystem.DownClimb());
@@ -172,8 +171,11 @@ public class RobotContainer {
     // Intake control
     // Start Intake
     m_operatorController.rightTrigger()
-        .onTrue(m_IntakeSubsystem.StartIntake())
-        .onFalse(m_IntakeSubsystem.StopIntake());
+        .onTrue(m_IntakeSubsystem.StartIntake());
+
+     m_operatorController.a()
+       .onTrue(AutoBuilder.buildAuto("Climb"));
+    
 
   }
 
