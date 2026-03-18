@@ -151,19 +151,7 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     }
 
     public void resetPose(Pose2d pose) {
-        // Convert encoder positions (rotations) to meters before resetting the
-        // pose estimator. Encoders return rotations for REV relative encoders
-        // by default; divide by the gear ratio and multiply by wheel
-        // circumference to get meters.
-        double leftMeters = leftEncoder.getPosition() / 8.45 * wheelCircumference;
-        double rightMeters = rightEncoder.getPosition() / 8.45 * wheelCircumference;
-
-        m_poseEstimator.resetPosition(
-            pigeon.getRotation2d(),
-            leftMeters,
-            rightMeters,
-            pose
-        );
+        //Photon vision should do this for us
     }
 
     // PathPlanner expects a supplier of chassis speeds (robot-relative velocities) for
@@ -190,12 +178,15 @@ private final DifferentialDriveKinematics kinematics = new DifferentialDriveKine
     double leftPer = wheelSpeedsDrive.leftMetersPerSecond / 7.0;
     double rightPer = wheelSpeedsDrive.rightMetersPerSecond / 7.0;
 
+     SmartDashboard.putNumber("leftPer", leftPer);
+     SmartDashboard.putNumber("rightPer", rightPer);
+
      // Clamp to [-1, 1] to avoid sending invalid outputs to motors.
      leftPer = Math.max(-1.0, Math.min(1.0, leftPer));
      rightPer = Math.max(-1.0, Math.min(1.0, rightPer));
 
-     SmartDashboard.putNumber("leftPer", leftPer);
-     SmartDashboard.putNumber("rightPer", rightPer);
+     SmartDashboard.putNumber("leftPerClamp", leftPer);
+     SmartDashboard.putNumber("rightPerClamp", rightPer);
      // Drive the motors during path following. We negate because motor
      // inversion or drivetrain configuration may require it.
      drive.tankDrive(-leftPer, -rightPer);
