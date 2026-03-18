@@ -59,11 +59,21 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+          
 
 
         // Configure the trigger bindings
     registerNamedCommands();
-    autoChooser = AutoBuilder.buildAutoChooser();
+        boolean isCompetition = true;
+
+    // Build an auto chooser. This will use Commands.none() as the default option.
+    // As an example, this will only show autos that start with "comp" while at
+    // competition as defined by the programmer
+    autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+      (stream) -> isCompetition
+        ? stream.filter(auto -> auto.getName().startsWith("."))
+        : stream
+    );
 
 
     configureBindings();
@@ -145,9 +155,10 @@ public class RobotContainer {
             m_IntakeSubsystem.StartIntake()));
 
     m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
-        .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator()));
+        .onTrue( m_AgitatorSubsystem.StopAgitator());
 
-    
+        m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_driverController.x().negate())
+        .onTrue(m_ShooterSubsystem.StopShoot());
 
   m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate())
       .onTrue(m_IntakeSubsystem.StopIntake());
@@ -179,13 +190,16 @@ public class RobotContainer {
 
      m_operatorController.a()
        .whileTrue(AutoBuilder.buildAuto("Climb"));
+     
+       m_driverController.x()
+        .onTrue(m_ShooterSubsystem.RevShoot());
     
 
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
+   *\
    * @return the command to run in autonomous
    */
 
@@ -194,8 +208,5 @@ public class RobotContainer {
      return autoChooser.getSelected();
   }
 
-  public Command DriveForwardCommand() {
-    // An example command will be run in autonomous
-    return autoChooser.getSelected();
-  }
+
 }

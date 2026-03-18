@@ -116,4 +116,15 @@ public class ShooterSubsystem extends SubsystemBase {
     });
   }
 
+
+  public Command RevShoot() {
+    return this.run(() -> {
+    ShooterUpper1Motor.set(-0.5);
+    ShooterUpper2Motor.set(0.5);
+   
+      shooterLowerMotor.setControl(percentOutput.withOutput(-0.73));
+
+    });
+  }
+
 }
