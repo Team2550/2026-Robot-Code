@@ -102,11 +102,11 @@ public final class Constants {
             
 
             public static final Transform3d kCameraToRobot = new Transform3d(
-                    0.1524, // forward from robot center     
-                    0.0, // left/right camera is centered
-                    0.2159, // up from floor
-                    new edu.wpi.first.math.geometry.Rotation3d(0, 0.0, 0));
-                                                                                            //3.14159265
+                    0.127, // forward from robot center     
+                    0.1651, // left/right camera is centered
+                    0.5588, // up from floor
+                    new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 0));
+                                                                                     
         }
 
         public static final class Agitator {
