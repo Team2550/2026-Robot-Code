@@ -111,6 +111,14 @@ public final class Constants {
                     0.5588, // up from floor
                     new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 0));
 
+            public static final Transform3d kCameraToRobot2 = new Transform3d(
+                    0.127, // forward from robot center     
+                    0.1651, // left/right camera is centered
+                    0.5588, // up from floor
+                    new edu.wpi.first.math.geometry.Rotation3d(0, 0, 0));
+
+            
+
         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
                                                                                      

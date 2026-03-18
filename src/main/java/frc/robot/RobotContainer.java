@@ -143,9 +143,10 @@ public class RobotContainer {
     // .onFalse(m_photonVision.resetClimb());
 
     m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
-        .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator(),
-            m_IntakeSubsystem.StopIntake()));
+        .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator()));
 
+  m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate())
+      .onTrue(m_IntakeSubsystem.StopIntake());
     // Climber control
     m_operatorController.a()
         .onTrue(m_ClimberSubsystem.OverDown())

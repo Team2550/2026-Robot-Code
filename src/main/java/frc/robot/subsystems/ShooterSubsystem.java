@@ -34,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Shooter.kShooterLowerPort);
 
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper1Motor.getEncoder();
-    PIDController shooterPID = new PIDController(0.00027, 0.00017, 0.000017);
+    PIDController shooterPID = new PIDController(0.0003, 0.00017, 0.000017);
     private final DutyCycleOut percentOutput = new DutyCycleOut(0);
 
   public ShooterSubsystem() {
@@ -79,12 +79,12 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command StartShoot() {
     return this.run(() -> {
 
-         double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 5000);
+         double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 4500);
       
 
             ShooterUpper1Motor.set(shooter);
             ShooterUpper2Motor.set(-shooter);
-      if (ShooterUpperEncoder.getVelocity() > 4000){
+      if (ShooterUpperEncoder.getVelocity() > 4200){
               shooterLowerMotor.setControl(percentOutput.withOutput(1));
   }
 });
@@ -92,10 +92,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void StartShootVoid(){
 
-      double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 5000);
+      double shooter = shooterPID.calculate(ShooterUpperEncoder.getVelocity(), 4500);
                 ShooterUpper1Motor.set(shooter);
             ShooterUpper2Motor.set(-shooter);
-      if (ShooterUpperEncoder.getVelocity() > 4000){
+      if (ShooterUpperEncoder.getVelocity() > 4200){
               shooterLowerMotor.setControl(percentOutput.withOutput(1));
              }
             }

@@ -93,7 +93,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command ReverseIntake() {
     return this.run(() -> {
-      IntakeMotor.setControl(percentOutput.withOutput(0.4));    
+      IntakeMotor.setControl(percentOutput.withOutput(-0.4));    
     });
   }
 

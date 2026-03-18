@@ -45,8 +45,10 @@ public class PhotonVision extends SubsystemBase {
   private final IntakeSubsystem m_IntakeSubsystem;
   private final ClimberSubsystem m_ClimberSubsystem;
   private PhotonPoseEstimator photonEstimator;
+  //private PhotonPoseEstimator photonEstimator2;
 
   private PhotonCamera camera;
+ // private PhotonCamera camera2;
 
   PIDController turnPID = new PIDController(0.1, 0.005, 0.01);
   PIDController drivePID = new PIDController(1.05, 0.005, 0.1);
@@ -78,6 +80,7 @@ public class PhotonVision extends SubsystemBase {
 
 
     camera = new PhotonCamera("MainCamera");
+   // camera2 = new PhotonCamera("SecondaryCamera");
 
     turnPID.setTolerance(3); // degrees
     drivePID.setTolerance(0.1524); // meters
@@ -87,12 +90,14 @@ public class PhotonVision extends SubsystemBase {
     photonEstimator = new PhotonPoseEstimator(
       Constants.Subsystems.Vision.kAprilTagFieldLayout,
         Constants.Subsystems.Vision.kCameraToRobot);
- 
- 
-      }
+      
 
+    // photonEstimator2 = new PhotonPoseEstimator(
+    //   Constants.Subsystems.Vision.kAprilTagFieldLayout,
+    //   Constants.Subsystems.Vision.kCameraToRobot2
+    // );
   
-    
+  }
 
   /**
    * Example command factory method.
@@ -124,15 +129,52 @@ public class PhotonVision extends SubsystemBase {
       RunCamera();
   }
 
+
+
   public void RunCamera(){
     var result = camera.getLatestResult();
-    if (result.hasTargets()) {
+   // var result2 = camera2.getLatestResult();
+    boolean cameraBool = false;
+      
+    if (result.hasTargets() ) {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
+      var camera1Targets = result.getTargets().size();
+     // var camera2Targets = result2.getTargets().size();
+
+
+      //if (camera1Targets > camera2Targets){
       visionEst = photonEstimator.estimateCoprocMultiTagPose(result);
+      cameraBool = false;
+      // } else {
+      //   visionEst = photonEstimator2.estimateCoprocMultiTagPose(result2);
+      //   cameraBool = true;
+      // }
+
       if (visionEst.isEmpty()) {
-        visionEst = photonEstimator.estimateLowestAmbiguityPose(result);
+          PhotonTrackedTarget camera1Am = result.getBestTarget();
+        // PhotonTrackedTarget camera2Am = result2.getBestTarget();
+
+        // if (camera1Am.getPoseAmbiguity() < camera2Am.getPoseAmbiguity()){
+             visionEst = photonEstimator.estimateLowestAmbiguityPose(result);  
+             cameraBool = false;
+        //  } else {
+        //   visionEst = photonEstimator2.estimateLowestAmbiguityPose(result2);
+        //   cameraBool = true;
+        //  }
+      
       }
-      updateEstimationStdDevs(visionEst, result.getTargets());
+    
+     
+
+
+//if (cameraBool){
+      // updateEstimationStdDevs(visionEst, result2.getTargets(), cameraBool);
+//} else {
+
+       updateEstimationStdDevs(visionEst, result.getTargets(), cameraBool);
+//}
+
+ 
        
       if (visionEst.isPresent()) {
         EstimatedRobotPose estPose = visionEst.get();
@@ -151,7 +193,7 @@ public class PhotonVision extends SubsystemBase {
 
 
     private void updateEstimationStdDevs(
-            Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+            Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets, boolean cameraNum1) {
         if (estimatedPose.isEmpty()) {
             // No pose input. Default to single-tag std devs
             curStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
@@ -162,7 +204,22 @@ public class PhotonVision extends SubsystemBase {
             int numTags = 0;
             double avgDist = 0;
 
-            // Precalculation - see how many tags we found, and calculate an average-distance metric
+          //   if (cameraNum1){
+          //   // Precalculation - see how many tags we found, and calculate an average-distance metric
+          //   for (var tgt : targets) {
+          //       var tagPose = photonEstimator2.getFieldTags().getTagPose(tgt.getFiducialId());
+          //       if (tagPose.isEmpty()) continue;
+          //       numTags++;
+          //       avgDist +=
+          //               tagPose
+          //                       .get()
+          //                       .toPose2d()
+          //                       .getTranslation()
+          //                       .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+          //   }
+
+          // } else {
+             // Precalculation - see how many tags we found, and calculate an average-distance metric
             for (var tgt : targets) {
                 var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
                 if (tagPose.isEmpty()) continue;
@@ -174,6 +231,8 @@ public class PhotonVision extends SubsystemBase {
                                 .getTranslation()
                                 .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
             }
+       //   }
+
 
             if (numTags == 0) {
                 // No tags visible. Default to single-tag std devs
