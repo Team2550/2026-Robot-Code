@@ -59,7 +59,7 @@ public final class Constants {
             public static final double kClimberManualSpeed = -0.2; // Climber Manual Speed = 20%
             // Targets
             public static final double kClimberUpTarget = 61.3;
-            public static final double kClimberDownTarget = 1.0;
+            public static final double kClimberDownTarget = 2.0;
         }
 
         public static final class Intake {
@@ -71,8 +71,8 @@ public final class Constants {
 
         public static final class Vision {
             //Target
-            public static final double kYawTarget = -9; //Degrees
-            public static final double kDistanceTarget = 1.9; //Meters
+            public static final double kYawTarget = 0.2; //Degrees
+            public static final double kDistanceTarget = 3.5; //Meters
             public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
                     .loadField(AprilTagFields.kDefaultField);
 
@@ -109,7 +109,7 @@ public final class Constants {
                     0.127, // forward from robot center     
                     0.1651, // left/right camera is centered
                     0.5588, // up from floor
-                    new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 0));
+                    new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 3.141593));
 
             public static final Transform3d kCameraToRobot2 = new Transform3d(
                     0.127, // forward from robot center     

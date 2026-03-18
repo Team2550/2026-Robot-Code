@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "OutLeft"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftBack"
+            "name": "AimShoot"
           }
         }
       ]

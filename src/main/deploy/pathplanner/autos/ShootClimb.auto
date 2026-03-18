@@ -1,0 +1,68 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUp"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Climb_UP"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AimShoot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Path1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUpAlign"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Climb_DOWN"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

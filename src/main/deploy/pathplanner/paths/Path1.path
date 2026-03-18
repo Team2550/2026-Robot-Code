@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.269482142857142,
-        "y": 7.43625
+        "x": 2.8118035714285714,
+        "y": 5.865196428571428
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.269482142857142,
-        "y": 7.43625
+        "x": 3.135732142857143,
+        "y": 5.444089285714285
       },
       "isLocked": false,
-      "linkedName": "OutLeftStart"
+      "linkedName": "EndOfBackUp"
     },
     {
       "anchor": {
-        "x": 7.703125,
-        "y": 6.6912142857142864
+        "x": 2.487875,
+        "y": 4.7
       },
       "prevControl": {
-        "x": 7.8165,
-        "y": 6.383482142857142
+        "x": 3.1033392857142856,
+        "y": 4.7
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndOfOut"
+      "linkedName": "EndPath1"
     }
   ],
   "rotationTargets": [],
@@ -33,19 +33,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 7.0,
-    "maxAngularVelocity": 540.0,
+    "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 26.565051177078058
   },
-  "reversed": true,
-  "folder": null,
+  "reversed": false,
+  "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

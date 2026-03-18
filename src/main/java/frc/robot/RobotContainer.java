@@ -118,6 +118,7 @@ public class RobotContainer {
   // Register named commands for use in PathPlanner autonomous paths
   private void registerNamedCommands() {
     NamedCommands.registerCommand("Shoot_1", m_ShooterSubsystem.StartShoot());
+    NamedCommands.registerCommand("AimShoot", m_photonVision.AimShootAuto());
     NamedCommands.registerCommand("Climb_UP", m_ClimberSubsystem.UpClimb());
     NamedCommands.registerCommand("Climb_DOWN", m_ClimberSubsystem.DownClimb());
     NamedCommands.registerCommand("Intake_ON", m_IntakeSubsystem.StartIntake());
@@ -132,6 +133,10 @@ public class RobotContainer {
     m_driverController.rightBumper()
         .onTrue(m_photonVision.AimShoot());
 
+    m_driverController.b()
+      .onTrue(m_ShooterSubsystem.StartShootFull())
+      .onFalse(m_ShooterSubsystem.StopShoot());
+
     
 
     // Start Shooter (constant speed)
@@ -139,19 +144,16 @@ public class RobotContainer {
         .onTrue(Commands.parallel(m_ShooterSubsystem.StartShoot(), m_AgitatorSubsystem.StartAgitator(),
             m_IntakeSubsystem.StartIntake()));
 
-    // m_operatorController.b()
-    // .whileTrue(m_photonVision.AimClimb())
-    // .onFalse(m_photonVision.resetClimb());
-
     m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
         .onTrue(Commands.parallel(m_ShooterSubsystem.StopShoot(), m_AgitatorSubsystem.StopAgitator()));
+
+    
 
   m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate())
       .onTrue(m_IntakeSubsystem.StopIntake());
     // Climber control
     m_operatorController.a()
         .onTrue(m_ClimberSubsystem.OverDown())
-
         .onFalse(m_ClimberSubsystem.StopClimb());
 
     // Climber Up All the way

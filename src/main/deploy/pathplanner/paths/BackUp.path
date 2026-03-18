@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.27,
-        "y": 4.018803571428571
+        "x": 3.9779464285714283,
+        "y": 5.865196428571428
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.706421351344683,
-        "y": 4.176094281767308
-      },
-      "isLocked": false,
-      "linkedName": "End of Forward Auto"
-    },
-    {
-      "anchor": {
-        "x": 7.168642857142856,
-        "y": 4.4075178571428575
-      },
-      "prevControl": {
-        "x": 7.3534973286165055,
-        "y": 4.133920964272222
-      },
-      "nextControl": {
-        "x": 6.9205015657489035,
-        "y": 4.774783445998092
+        "x": 3.232910714285714,
+        "y": 5.719428571428571
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.865089285714285,
-        "y": 5.557464285714286
+        "x": 2.8118035714285714,
+        "y": 5.865196428571428
       },
       "prevControl": {
-        "x": 7.193772118780629,
-        "y": 5.249681858835492
+        "x": 3.200517857142857,
+        "y": 5.492678571428572
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "EndOfBackUp"
     }
   ],
   "rotationTargets": [],
@@ -49,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 7.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -60,8 +44,8 @@
     "velocity": 0,
     "rotation": 0.0
   },
-  "reversed": false,
-  "folder": null,
+  "reversed": true,
+  "folder": "New Folder",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

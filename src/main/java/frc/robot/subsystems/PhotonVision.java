@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 
@@ -29,6 +30,7 @@ import org.photonvision.PhotonPoseEstimator;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 
 
 
@@ -47,10 +49,8 @@ public class PhotonVision extends SubsystemBase {
   private PhotonCamera camera;
  // private PhotonCamera camera2;
 
-  PIDController turnPID = new PIDController(0.1, 0.005, 0.01);
-  PIDController drivePID = new PIDController(1.05, 0.005, 0.1);
-  PIDController climbDrivePID = new PIDController(1.05, 0.005, 0.1);
-  PIDController climbTurnPID = new PIDController(0.1, 0.005, 0.01);
+  PIDController turnPID = new PIDController(0.2, 0.006, 0.01);
+  PIDController drivePID = new PIDController(2.2, 0.005, 0.1);
   Rotation2d targetYaw;
   Rotation2d climbTargetYaw;
   double distanceToTarget;
@@ -60,6 +60,7 @@ public class PhotonVision extends SubsystemBase {
   boolean climbFirst = false;
   private final Timer timer = new Timer();
   private Matrix<N3, N1> curStdDevs;
+  Timer myTimer = new Timer();
 
   /**
    * Construct PhotonVision with shared subsystem references.
@@ -80,9 +81,7 @@ public class PhotonVision extends SubsystemBase {
    // camera2 = new PhotonCamera("SecondaryCamera");
 
     turnPID.setTolerance(3); // degrees
-    drivePID.setTolerance(0.1524); // meters
-    climbTurnPID.setTolerance(3);
-    climbDrivePID.setTolerance(Units.inchesToMeters(2));
+    drivePID.setTolerance(0.07); // meters
 
     photonEstimator = new PhotonPoseEstimator(
       Constants.Subsystems.Vision.kAprilTagFieldLayout,
@@ -297,6 +296,7 @@ public class PhotonVision extends SubsystemBase {
           System.out.println("Yaw" + targetYaw.getDegrees());
           double rotaioionSpeed = turnPID.calculate(targetYaw.getDegrees(), Constants.Subsystems.Vision.kYawTarget);
 
+          SmartDashboard.putNumber("Dis", distanceToTarget);
           double driveSpeed = drivePID.calculate(distanceToTarget, Constants.Subsystems.Vision.kDistanceTarget);
   
 
@@ -326,6 +326,70 @@ public class PhotonVision extends SubsystemBase {
     }, m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem);
   }
 
+
+  public Command AimShootAuto() {
+    return new RunCommand(() -> {
+        myTimer.start();
+          
+          RunCamera();
+          double distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+              Constants.Subsystems.Vision.kHubPoseBlue);
+          Rotation2d targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(),
+              Constants.Subsystems.Vision.kHubPoseBlue);
+
+          var allianceOptional = DriverStation.getAlliance();
+          DriverStation.Alliance alliance = allianceOptional.get();
+
+          if (alliance == DriverStation.Alliance.Red) {
+            // Distance
+            distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+                Constants.Subsystems.Vision.kHubPoseRed);
+            // Rotation
+            targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(), Constants.Subsystems.Vision.kHubPoseRed);
+
+          } else if (alliance == DriverStation.Alliance.Blue) {
+            // Distance
+            distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
+                Constants.Subsystems.Vision.kHubPoseBlue);
+    
+            // Rotation
+            targetYaw = PhotonUtils.getYawToPose(m_driveSubsystem.get2dPose(), Constants.Subsystems.Vision.kHubPoseBlue);
+          } else {
+            System.out.println("Error loading Allance color");
+          }
+
+          System.out.println("Yaw" + targetYaw.getDegrees());
+          double rotaioionSpeed = turnPID.calculate(targetYaw.getDegrees(), Constants.Subsystems.Vision.kYawTarget);
+
+          double driveSpeed = drivePID.calculate(distanceToTarget, Constants.Subsystems.Vision.kDistanceTarget);
+  
+
+          // Clamp to safty range
+          rotaioionSpeed = MathUtil.clamp(rotaioionSpeed, -0.7,
+             0.7);
+          driveSpeed = MathUtil.clamp(driveSpeed, -1,
+              1);
+
+                  
+          if (!turnPID.atSetpoint()) {
+            m_driveSubsystem.arcadeDrive(0, rotaioionSpeed);
+          } else {
+            m_driveSubsystem.arcadeDrive(driveSpeed, 0);
+          }
+
+          System.out.println("Turn: " + turnPID.atSetpoint() + "Drive" + drivePID.atSetpoint());
+          if (turnPID.atSetpoint() && drivePID.atSetpoint()) {
+            m_driveSubsystem.arcadeDrive(0, 0);
+            m_ShooterSubsystem.StartShootVoid();
+            m_AgitatorSubsystem.StartAgitatorVoid();
+            System.out.println("Shooting");
+            m_IntakeSubsystem.StartIntakeVoid();
+          } 
+
+
+    }, m_driveSubsystem, m_ShooterSubsystem, m_AgitatorSubsystem, m_IntakeSubsystem)
+    .until(() -> myTimer.hasElapsed(5));
+  }
 
 
 

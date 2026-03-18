@@ -65,8 +65,8 @@ public class DriveSubsystem extends SubsystemBase {
     private final DifferentialDrivePoseEstimator m_poseEstimator = new DifferentialDrivePoseEstimator(
             Constants.Subsystems.Drive.kinematics,
             pigeon.getRotation2d(),
-            leftEncoder.getPosition() / 8.45 * wheelCircumference,
-            rightEncoder.getPosition() / 8.45 * wheelCircumference,
+           - leftEncoder.getPosition() / 8.45 * wheelCircumference,
+            -rightEncoder.getPosition() / 8.45 * wheelCircumference,
             new Pose2d(),
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
@@ -215,8 +215,8 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Convert encoder positions to meters (absolute)
-        double leftMeters = leftEncoder.getPosition() / 8.45 * wheelCircumference;
-        double rightMeters = rightEncoder.getPosition() / 8.45 * wheelCircumference;
+        double leftMeters = -leftEncoder.getPosition() / 8.45 * wheelCircumference;
+        double rightMeters = -rightEncoder.getPosition() / 8.45 * wheelCircumference;
 
         // Update pose estimator with current gyro angle and absolute wheel positions
         m_poseEstimator.update(pigeon.getRotation2d(), leftMeters, rightMeters);
