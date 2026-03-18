@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 // For CAN
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 // For PWM
@@ -18,7 +21,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private SparkMax IntakeMotor = new SparkMax(Constants.Subsystems.Intake.kIntakePort, MotorType.kBrushless);
-
+  private final RelativeEncoder intakeEncoder = IntakeMotor.getEncoder();
+    PIDController speedPID = new PIDController(0.0008, 0.0005, 0.00005);
 
   public IntakeSubsystem() {
     
@@ -53,11 +57,13 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Intake", intakeEncoder.getVelocity());
   }
 
   public Command StartIntake() {
     return this.run(() -> {
-      IntakeMotor.set(Constants.Subsystems.Intake.kMaxIntakeSpeed);
+                double intake = speedPID.calculate(intakeEncoder.getVelocity(), 900);
+      IntakeMotor.set(intake);
     });
   }
 

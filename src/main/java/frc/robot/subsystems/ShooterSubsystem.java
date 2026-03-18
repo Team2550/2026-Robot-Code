@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
+
 
 // For CAN
 import com.revrobotics.spark.SparkMax;
@@ -24,7 +26,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private SparkMax Shooter1Motor = new SparkMax(Constants.Subsystems.Shooter.kShooter1Port, MotorType.kBrushless);
   private PWMVictorSPX Shooter2Motor = new PWMVictorSPX(Constants.Subsystems.Shooter.kShooter2Port);
   private final RelativeEncoder ShooterEncoder = Shooter1Motor.getEncoder();
-  // private final PIDController pid = new PIDController(0, 0.0, 0.0);
+    PIDController shooterPID = new PIDController(0.00027, 0.00017, 0.000017);
 
 
   public ShooterSubsystem() {
@@ -69,16 +71,19 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command StartShoot() {
     return this.run(() -> {
 
+         double shooter = shooterPID.calculate(ShooterEncoder.getVelocity(), 5000);
+      
 
-
-            Shooter1Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut1);
-      if (ShooterEncoder.getVelocity() > 2000){
+            Shooter1Motor.set(shooter);
+      if (ShooterEncoder.getVelocity() > 4000){
               Shooter2Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut2);
   }});
   }
 
   public void StartShootVoid(){
-            Shooter1Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut1);
+
+      double shooter = shooterPID.calculate(ShooterEncoder.getVelocity(), 5000);
+            Shooter1Motor.set(shooter);
       if (ShooterEncoder.getVelocity() > 2000){
               Shooter2Motor.set(Constants.Subsystems.Shooter.kMaxShooterSpeedOut2);
   }  }

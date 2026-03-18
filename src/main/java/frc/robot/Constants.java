@@ -79,7 +79,7 @@ public final class Constants {
 
         public static final class Vision {
             //Target
-            public static final double kYawTarget = -8; //Degrees
+            public static final double kYawTarget = -9; //Degrees
             public static final double kDistanceTarget = 1.9; //Meters
             public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
                     .loadField(AprilTagFields.kDefaultField);
@@ -91,6 +91,15 @@ public final class Constants {
             public static final Pose2d kHubPoseRed = new Pose2d(
                 Units.inchesToMeters(469.64),
                 Units.inchesToMeters(158.84),
+                new Rotation2d(0.0));
+
+            public static final Pose2d blueClimbPos = new Pose2d(
+                    Units.inchesToMeters(163.86),
+                    Units.inchesToMeters(21.75 + 11.46),
+                    new Rotation2d(0.0));
+            public static final Pose2d redClimbPos = new Pose2d(
+                Units.inchesToMeters(649.57),
+                Units.inchesToMeters(152.78 - 11.46),
                 new Rotation2d(0.0));
 
             public static final Transform3d kCameraToRobot = new Transform3d(
@@ -105,7 +114,7 @@ public final class Constants {
             // Ports
             public static final int kAgitatorPort = 7;//PWM
             // Speeds
-            public static final double kMaxAgitatorSpeed = 1.0; // Agitator Speed = 30%
+            public static final double kMaxAgitatorSpeed = 0.7; // Agitator Speed = 30%
         }
     }
 
