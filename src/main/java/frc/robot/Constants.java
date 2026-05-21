@@ -32,8 +32,8 @@ public final class Constants {
             public static final int kGyroPort = 17;
             // Speeds
             public static final double kStickDeadband = 0.07;
-            public static final double kMaxBoostSpeed = 1.00;
-            public static final double kMaxNormalSpeed = 0.70;
+            public static final double kMaxBoostSpeed = 0.80;
+            public static final double kMaxNormalSpeed = 0.60;
             public static final double kMaxRotSpeed = 0.5; // Only used in vision
         
             public static final DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(5.46);
@@ -106,8 +106,8 @@ public final class Constants {
             
 
             public static final Transform3d kCameraToRobot = new Transform3d(
-                    0.127, // forward from robot center     
-                    0.1651, // left/right camera is centered
+                    -0.127, // forward from robot center     
+                    0.1651, // left/right 
                     0.5588, // up from floor
                     new edu.wpi.first.math.geometry.Rotation3d(0, 0.1745329, 3.141593));
 

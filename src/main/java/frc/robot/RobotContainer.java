@@ -140,12 +140,12 @@ public class RobotContainer {
   private void configureBindings() {
     // Driver Controls
     // Shooter control
-    m_driverController.rightBumper()
-        .onTrue(m_photonVision.AimShoot());
+    // m_driverController.rightBumper()
+    //     .onTrue(m_photonVision.AimShoot());
 
-    m_driverController.b()
-      .onTrue(m_ShooterSubsystem.StartShootFull())
-      .onFalse(m_ShooterSubsystem.StopShoot());
+    // m_driverController.b()
+    //   .onTrue(m_ShooterSubsystem.StartShootFull())
+    //   .onFalse(m_ShooterSubsystem.StopShoot());
 
     
 

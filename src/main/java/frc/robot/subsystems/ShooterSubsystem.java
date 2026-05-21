@@ -28,13 +28,15 @@ public class ShooterSubsystem extends SubsystemBase {
       MotorType.kBrushless);
   private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Shooter.kShooterLowerPort);
 
+
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper2Motor.getEncoder();
-  PIDController shooterPID = new PIDController(0.0004, 0.0003, 0.000017);
+  PIDController shooterPID = new PIDController(0.00003, 0.0001, 0.000017);
   private final DutyCycleOut percentOutput = new DutyCycleOut(0);
+  double shooterSpeed = 2900;
 
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
-
+    SmartDashboard.putNumber("Shooter Speed", 2900);
   }
 
   /**
@@ -67,17 +69,20 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SmartDashboard.putNumber("Shooter RPM", Math.abs(ShooterUpperEncoder.getVelocity()));
+    shooterSpeed = SmartDashboard.getNumber("Shooter Speed", shooterSpeed);
+    
+
 
   }
 
   public Command StartShoot() {
     return this.run(() -> {
 
-      double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), 3350);
+      double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), shooterSpeed);
 
       ShooterUpper1Motor.set(shooter);
       ShooterUpper2Motor.set(-shooter);
-      if (Math.abs(ShooterUpperEncoder.getVelocity()) > 3200) {
+      if (Math.abs(ShooterUpperEncoder.getVelocity()) > shooterSpeed - 200) {
         shooterLowerMotor.setControl(percentOutput.withOutput(1));
       }
     });
@@ -85,10 +90,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void StartShootVoid() {
 
-    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), 3350);
+    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), shooterSpeed);
     ShooterUpper1Motor.set(shooter);
     ShooterUpper2Motor.set(-shooter);
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > 3200) {
+    if (Math.abs(ShooterUpperEncoder.getVelocity()) > shooterSpeed - 200) {
       shooterLowerMotor.setControl(percentOutput.withOutput(1));
     }
   }
