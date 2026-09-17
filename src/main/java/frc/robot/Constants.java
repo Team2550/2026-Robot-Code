@@ -48,16 +48,11 @@ public final class Constants {
       // Target speed in RPM for the shooter
       public static final InterpolatingDoubleTreeMap kShooterSpeedMap = new InterpolatingDoubleTreeMap();
       static {
-        kShooterSpeedMap.put(0.5, 3427.0);
-        kShooterSpeedMap.put(1.0, 3427.0);
-        kShooterSpeedMap.put(1.5, 3427.0);
-        kShooterSpeedMap.put(2.0, 3427.0);
-        kShooterSpeedMap.put(2.5, 3427.0);
-        kShooterSpeedMap.put(3.0, 3427.0);
-        kShooterSpeedMap.put(3.5, 3427.0);
-        kShooterSpeedMap.put(4.0, 3427.0);
-        kShooterSpeedMap.put(4.5, 3427.0);
-        kShooterSpeedMap.put(5.0, 3427.0);
+        kShooterSpeedMap.put(2.455, 2845.0);
+        kShooterSpeedMap.put(3.099, 3033.0);
+        kShooterSpeedMap.put(3.837, 3360.0);
+        kShooterSpeedMap.put(4.459, 3607.0);
+        kShooterSpeedMap.put(5.179, 3998.0);
       }
     }
 

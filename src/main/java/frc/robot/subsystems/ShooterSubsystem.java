@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
@@ -31,15 +32,30 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper2Motor.getEncoder();
 
-  private double P = 0.0003;
+  // UNITS:
+  // - ShooterUpperEncoder.getVelocity() returns MOTOR RPM (no velocity
+  // conversion factor is set on the SparkMax), so setpoints are in RPM.
+  // - Motors are driven with setVoltage(), so PID + feedforward output VOLTS.
+  //
+  // PID: input = RPM error, output = volts -> P is in volts per RPM.
+  private double P = 0.0008;
   private double I = 0.00;
-  private double D = 0.0000;
+  private double D = 0.0009;
 
   PIDController shooterPID = new PIDController(P, I, D);
-  SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(0.000, 0.00018);
+
+  // Feedforward: input = RPS (rotations per SECOND), output = volts.
+  // kS = volts to overcome friction, kV = volts per RPS.
+  // NEO free speed is ~5676 RPM = ~94.6 RPS at 12 V -> kV ~= 12 / 94.6 ~= 0.127
+  // V/RPS.
+  // (The old value 0.00018 was ~1/5676, i.e. duty-cycle per RPM, not volts per
+  // RPS.)
+  private static final double kS = 0.0;
+  private static final double kV = 12.0 / (5676.0 / 60.0);
+  SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(kS, kV);
 
   private final DutyCycleOut percentOutput = new DutyCycleOut(0);
-  private final double shooterSpeed = 1000;
+  private final double shooterSpeed = 1000; // RPM
 
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
@@ -80,24 +96,49 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SmartDashboard.putNumber("Shooter RPM", Math.abs(ShooterUpperEncoder.getVelocity()));
-    P = SmartDashboard.getNumber("P", P);
-    I = SmartDashboard.getNumber("I", I);
-    D = SmartDashboard.getNumber("D", D);
-    shooterPID = new PIDController(P, I, D);
+    // P = SmartDashboard.getNumber("P", P);
+    // I = SmartDashboard.getNumber("I", I);
+    // D = SmartDashboard.getNumber("D", D);
+    // Update gains in place (re-creating the controller every loop wipes the
+    // I accumulator and D history)
+    // shooterPID.setPID(P, I, D);
 
   }
 
   public Command StartShoot() {
     return this.run(() -> {
 
-      double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), 3350);
-
-      ShooterUpper1Motor.set(shooter);
-      ShooterUpper2Motor.set(-shooter);
-      if (Math.abs(ShooterUpperEncoder.getVelocity()) > 3200) {
-        shooterLowerMotor.setControl(percentOutput.withOutput(1));
-      }
+      runShooterAtRPM(3350);
     });
+  }
+
+  /** Measured shooter speed in RPM (positive). */
+  private double getShooterRPM() {
+    return Math.abs(ShooterUpperEncoder.getVelocity());
+  }
+
+  /**
+   * Closed-loop velocity control. Feeds the lower (kicker) motor once the
+   * shooter is within 150 RPM of the target.
+   *
+   * @param targetRPM target speed in motor RPM
+   */
+  private void runShooterAtRPM(double targetRPM) {
+    double currentRPM = getShooterRPM();
+
+    double ffVoltage = shooterFeedforward.calculate(targetRPM / 60.0); // RPM -> RPS
+    double pidVoltage = shooterPID.calculate(currentRPM, targetRPM); // RPM in, volts out
+    double volts = MathUtil.clamp(ffVoltage + pidVoltage, -12.0, 12.0);
+
+    ShooterUpper1Motor.setVoltage(volts);
+    ShooterUpper2Motor.setVoltage(-volts);
+
+    SmartDashboard.putNumber("Shooter Target RPM", targetRPM);
+    SmartDashboard.putNumber("Shooter Volts", volts);
+
+    if (currentRPM > targetRPM - 150) {
+      shooterLowerMotor.setControl(percentOutput.withOutput(1));
+    }
   }
 
   public void StartShootVoid(double distance) {
@@ -106,15 +147,8 @@ public class ShooterSubsystem extends SubsystemBase {
     // shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
     // Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
     // }
-    double ffVoltage = shooterFeedforward.calculate(SmartDashboard.getNumber("SHOOTER SPEED", 3350) / 60);
-    double pidVoltage = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
-        SmartDashboard.getNumber("SHOOTER SPEED", 3350));
-
-    ShooterUpper1Motor.setVoltage(pidVoltage + ffVoltage);
-    ShooterUpper2Motor.setVoltage(-(pidVoltage + ffVoltage));
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > SmartDashboard.getNumber("SHOOTER SPEED", 3350) - 200) {
-      shooterLowerMotor.setControl(percentOutput.withOutput(1));
-    }
+    // "SHOOTER SPEED" on the dashboard is in RPM
+    runShooterAtRPM(Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
   }
 
   public Command StartShootFull() {
