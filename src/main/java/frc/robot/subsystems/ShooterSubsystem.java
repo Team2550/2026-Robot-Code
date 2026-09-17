@@ -31,10 +31,12 @@ public class ShooterSubsystem extends SubsystemBase {
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper2Motor.getEncoder();
   PIDController shooterPID = new PIDController(0.0004, 0.0003, 0.000017);
   private final DutyCycleOut percentOutput = new DutyCycleOut(0);
+  private final double shooterSpeed = 1000;
+
 
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
-
+   SmartDashboard.putNumber("SHOOTER SPEED", shooterSpeed);
   }
 
   /**
@@ -67,8 +69,11 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SmartDashboard.putNumber("Shooter RPM", Math.abs(ShooterUpperEncoder.getVelocity()));
+    
 
   }
+
+
 
   public Command StartShoot() {
     return this.run(() -> {
@@ -83,12 +88,16 @@ public class ShooterSubsystem extends SubsystemBase {
     });
   }
 
-  public void StartShootVoid() {
+  public void StartShootVoid(double distance) {
 
-    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), 3350);
+    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), SmartDashboard.getNumber("SHOOTER SPEED", 3350)); //3350
+    // if (distance != 0){
+    //    shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
+    // } 
+
     ShooterUpper1Motor.set(shooter);
     ShooterUpper2Motor.set(-shooter);
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > 3200) {
+    if (Math.abs(ShooterUpperEncoder.getVelocity()) > Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance) - 200) {
       shooterLowerMotor.setControl(percentOutput.withOutput(1));
     }
   }

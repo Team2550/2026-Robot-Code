@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +29,7 @@ import org.photonvision.PhotonPoseEstimator;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.Timer;
+
 
 
 
@@ -131,12 +130,15 @@ public class PhotonVision extends SubsystemBase {
     var result = camera.getLatestResult();
    // var result2 = camera2.getLatestResult();
     boolean cameraBool = false;
-      
+
+    SmartDashboard.putBoolean("Vision/HasTargets", result.hasTargets());
+
     if (result.hasTargets() ) {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
      // var camera1Targets = result.getTargets().size();
      // var camera2Targets = result2.getTargets().size();
 
+      SmartDashboard.putNumber("Vision/NumTargets", result.getTargets().size());
 
       //if (camera1Targets > camera2Targets){
       visionEst = photonEstimator.estimateCoprocMultiTagPose(result);
@@ -146,23 +148,28 @@ public class PhotonVision extends SubsystemBase {
       //   cameraBool = true;
       // }
 
+      SmartDashboard.putBoolean("Vision/MultiTagPresent", visionEst.isPresent());
+
       if (visionEst.isEmpty()) {
           PhotonTrackedTarget camera1Am = result.getBestTarget();
         // PhotonTrackedTarget camera2Am = result2.getBestTarget();
 
+        SmartDashboard.putNumber("Vision/BestTagAmbiguity", camera1Am.getPoseAmbiguity());
+        SmartDashboard.putNumber("Vision/BestTagId", camera1Am.getFiducialId());
+
         // if (camera1Am.getPoseAmbiguity() < camera2Am.getPoseAmbiguity()){
         if (camera1Am.getPoseAmbiguity() < 0.3){
-             visionEst = photonEstimator.estimateLowestAmbiguityPose(result);  
+             visionEst = photonEstimator.estimateLowestAmbiguityPose(result);
              cameraBool = false;
         }
         //  } else {
         //   visionEst = photonEstimator2.estimateLowestAmbiguityPose(result2);
         //   cameraBool = true;
         //  }
-      
+
       }
-    
-     
+
+
 
 
 //if (cameraBool){
@@ -172,14 +179,23 @@ public class PhotonVision extends SubsystemBase {
        updateEstimationStdDevs(visionEst, result.getTargets(), cameraBool);
 //}
 
- 
-       
+      SmartDashboard.putBoolean("Vision/EstimatePresent", visionEst.isPresent());
+
       if (visionEst.isPresent()) {
         EstimatedRobotPose estPose = visionEst.get();
         Pose3d pose3d = estPose.estimatedPose;
         Pose2d VisionEst2d = pose3d.toPose2d();
-        
+
         var estStdDevs = getEstimationStdDevs();
+
+        SmartDashboard.putNumber("Vision/EstX", VisionEst2d.getX());
+        SmartDashboard.putNumber("Vision/EstY", VisionEst2d.getY());
+        SmartDashboard.putNumber("Vision/EstTheta", VisionEst2d.getRotation().getDegrees());
+        SmartDashboard.putNumber("Vision/EstTimestamp", estPose.timestampSeconds);
+        SmartDashboard.putNumber("Vision/FpgaTimestamp", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("Vision/StdDevX", estStdDevs.get(0, 0));
+        SmartDashboard.putNumber("Vision/StdDevY", estStdDevs.get(1, 0));
+
         m_driveSubsystem.addVisionMeasurement(VisionEst2d, estPose.timestampSeconds, estStdDevs);
       }
     }
@@ -297,26 +313,20 @@ public class PhotonVision extends SubsystemBase {
           double rotaioionSpeed = turnPID.calculate(targetYaw.getDegrees(), Constants.Subsystems.Vision.kYawTarget);
 
           SmartDashboard.putNumber("Dis", distanceToTarget);
-          double driveSpeed = drivePID.calculate(distanceToTarget, Constants.Subsystems.Vision.kDistanceTarget);
-  
+    
 
           // Clamp to safty range
           rotaioionSpeed = MathUtil.clamp(rotaioionSpeed, -0.7,
              0.7);
-          driveSpeed = MathUtil.clamp(driveSpeed, -1,
-              1);
 
                   
           if (!turnPID.atSetpoint()) {
             m_driveSubsystem.arcadeDrive(0, rotaioionSpeed);
-          } else {
-            m_driveSubsystem.arcadeDrive(driveSpeed, 0);
-          }
-
-          System.out.println("Turn: " + turnPID.atSetpoint() + "Drive" + drivePID.atSetpoint());
-          if (turnPID.atSetpoint() && drivePID.atSetpoint()) {
+               System.out.println("Turn: " + turnPID.atSetpoint());
+          } else
+ {
             m_driveSubsystem.arcadeDrive(0, 0);
-            m_ShooterSubsystem.StartShootVoid();
+            m_ShooterSubsystem.StartShootVoid(distanceToTarget);
             m_AgitatorSubsystem.StartAgitatorVoid();
             System.out.println("Shooting");
             m_IntakeSubsystem.StartIntakeVoid();
@@ -361,26 +371,20 @@ public class PhotonVision extends SubsystemBase {
           System.out.println("Yaw" + targetYaw.getDegrees());
           double rotaioionSpeed = turnPID.calculate(targetYaw.getDegrees(), Constants.Subsystems.Vision.kYawTarget);
 
-          double driveSpeed = drivePID.calculate(distanceToTarget, Constants.Subsystems.Vision.kDistanceTarget);
+     
   
 
           // Clamp to safty range
           rotaioionSpeed = MathUtil.clamp(rotaioionSpeed, -0.7,
              0.7);
-          driveSpeed = MathUtil.clamp(driveSpeed, -1,
-              1);
+
 
                   
           if (!turnPID.atSetpoint()) {
             m_driveSubsystem.arcadeDrive(0, rotaioionSpeed);
           } else {
-            m_driveSubsystem.arcadeDrive(driveSpeed, 0);
-          }
-
-          System.out.println("Turn: " + turnPID.atSetpoint() + "Drive" + drivePID.atSetpoint());
-          if (turnPID.atSetpoint() && drivePID.atSetpoint()) {
             m_driveSubsystem.arcadeDrive(0, 0);
-            m_ShooterSubsystem.StartShootVoid();
+            m_ShooterSubsystem.StartShootVoid(distanceToTarget);
             m_AgitatorSubsystem.StartAgitatorVoid();
             System.out.println("Shooting");
             m_IntakeSubsystem.StartIntakeVoid();

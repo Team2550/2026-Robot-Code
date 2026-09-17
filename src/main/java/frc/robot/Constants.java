@@ -16,6 +16,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 
 
@@ -48,6 +49,20 @@ public final class Constants {
             public static final double kMaxShooterSpeedOut1 = 0.85;// Shooter =85%
             public static final double kMaxShooterSpeedOut2 = 0.76;// Shooter = 76%
             public static final double kShooterTargetSpeedUpper = 3427.0; // Target speed in RPM for the shooter
+            // Target speed in RPM for the shooter
+            public static final InterpolatingDoubleTreeMap kShooterSpeedMap = new InterpolatingDoubleTreeMap();
+            static {
+            kShooterSpeedMap.put(0.5, 3427.0);
+            kShooterSpeedMap.put(1.0, 3427.0);
+            kShooterSpeedMap.put(1.5, 3427.0);
+            kShooterSpeedMap.put(2.0, 3427.0);
+            kShooterSpeedMap.put(2.5, 3427.0);
+            kShooterSpeedMap.put(3.0, 3427.0);
+            kShooterSpeedMap.put(3.5, 3427.0);
+            kShooterSpeedMap.put(4.0, 3427.0);
+            kShooterSpeedMap.put(4.5, 3427.0);
+            kShooterSpeedMap.put(5.0, 3427.0);
+                    }
         }
 
         public static final class Climber {
