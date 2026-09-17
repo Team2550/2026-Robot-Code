@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
     // If FMS is not connected, this may return -1
     if (timeRemaining >= 0) {
       SmartDashboard.putNumber("Match Time", timeRemaining);
-    } 
+    }
 
   }
 
@@ -81,15 +81,14 @@ public class Robot extends TimedRobot {
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(
-        m_autonomousCommand
-        );
+          m_autonomousCommand);
     }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    
+
   }
 
   @Override
@@ -100,22 +99,21 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-      
+
     }
-    
 
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-      // Get match time from DriverStation
+    // Get match time from DriverStation
     double timeRemaining = DriverStation.getMatchTime();
 
     // If FMS is not connected, this may return -1
     if (timeRemaining >= 0) {
       SmartDashboard.putNumber("Match Time", timeRemaining);
-    } 
+    }
 
   }
 

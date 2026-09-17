@@ -59,22 +59,18 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-          
 
-
-        // Configure the trigger bindings
+    // Configure the trigger bindings
     registerNamedCommands();
-        boolean isCompetition = true;
+    boolean isCompetition = true;
 
     // Build an auto chooser. This will use Commands.none() as the default option.
     // As an example, this will only show autos that start with "comp" while at
     // competition as defined by the programmer
     autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
-      (stream) -> isCompetition
-        ? stream.filter(auto -> auto.getName().startsWith("."))
-        : stream
-    );
-
+        (stream) -> isCompetition
+            ? stream.filter(auto -> auto.getName().startsWith("."))
+            : stream);
 
     configureBindings();
     // drive command
@@ -84,9 +80,9 @@ public class RobotContainer {
             () -> {
               if (m_arcade) {
                 double rot = applyDeadbandAndScale(m_driverController.getRightX());
-            
-                  fwd = applyDeadbandAndScale(m_driverController.getLeftY());
-                
+
+                fwd = applyDeadbandAndScale(m_driverController.getLeftY());
+
                 // arcadeDrive expects (fwd, rot)
                 m_driveSubsystem.arcadeDrive(fwd, rot);
               } else {
@@ -100,7 +96,7 @@ public class RobotContainer {
 
     // Toggle drive mode -- false = tank, true = arcade
     SmartDashboard.putData("Toggle Drive Mode", new InstantCommand(() -> m_arcade = !m_arcade));
-  
+
     SmartDashboard.putBoolean("Drive Direction", back);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -144,24 +140,24 @@ public class RobotContainer {
         .onTrue(m_photonVision.AimShoot());
 
     m_driverController.b()
-      .onTrue(m_ShooterSubsystem.StartShootFull())
-      .onFalse(m_ShooterSubsystem.StopShoot());
-
-    
+        .onTrue(m_ShooterSubsystem.StartShootFull())
+        .onFalse(m_ShooterSubsystem.StopShoot());
 
     // Start Shooter (constant speed)
     m_driverController.rightTrigger()
         .onTrue(Commands.parallel(m_ShooterSubsystem.StartShoot(), m_AgitatorSubsystem.StartAgitator(),
             m_IntakeSubsystem.StartIntake()));
+     
+    m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
+        .onTrue(m_AgitatorSubsystem.StopAgitator());
 
     m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
-        .onTrue( m_AgitatorSubsystem.StopAgitator());
-
-        m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_driverController.x().negate())
+        .and(m_driverController.x().negate())
         .onTrue(m_ShooterSubsystem.StopShoot());
 
-  m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate()).and(m_operatorController.leftTrigger().negate())
-      .onTrue(m_IntakeSubsystem.StopIntake());
+    m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
+        .and(m_operatorController.rightTrigger().negate()).and(m_operatorController.leftTrigger().negate())
+        .onTrue(m_IntakeSubsystem.StopIntake());
     // Climber control
     m_operatorController.a()
         .onTrue(m_ClimberSubsystem.OverDown())
@@ -192,25 +188,24 @@ public class RobotContainer {
     m_operatorController.leftTrigger()
         .onTrue(m_IntakeSubsystem.ReverseIntake());
 
-     m_operatorController.a()
-       .whileTrue(AutoBuilder.buildAuto("Climb"));
-     
-       m_driverController.x()
+    m_operatorController.a()
+        .whileTrue(AutoBuilder.buildAuto("Climb"));
+
+    m_driverController.x()
         .onTrue(m_ShooterSubsystem.RevShoot());
-    
 
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *\
+   * \
+   * 
    * @return the command to run in autonomous
    */
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-     return autoChooser.getSelected();
+    return autoChooser.getSelected();
   }
-
 
 }

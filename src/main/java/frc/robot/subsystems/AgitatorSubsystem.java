@@ -21,7 +21,6 @@ public class AgitatorSubsystem extends SubsystemBase {
 
   public AgitatorSubsystem() {
 
-
   }
 
   /**
@@ -56,18 +55,17 @@ public class AgitatorSubsystem extends SubsystemBase {
 
   public Command StartAgitator() {
     return this.run(() -> {
-       AgitatorMotor.set(-Constants.Subsystems.Agitator.kMaxAgitatorSpeed);
+      AgitatorMotor.set(-Constants.Subsystems.Agitator.kMaxAgitatorSpeed);
     });
   }
 
-
   public void StartAgitatorVoid() {
-  AgitatorMotor.set(-Constants.Subsystems.Agitator.kMaxAgitatorSpeed);  }
-
+    AgitatorMotor.set(-Constants.Subsystems.Agitator.kMaxAgitatorSpeed);
+  }
 
   public Command StopAgitator() {
     return this.run(() -> {
-       AgitatorMotor.set(0);
+      AgitatorMotor.set(0);
     });
   }
 

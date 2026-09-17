@@ -33,10 +33,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private final DutyCycleOut percentOutput = new DutyCycleOut(0);
   private final double shooterSpeed = 1000;
 
-
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
-   SmartDashboard.putNumber("SHOOTER SPEED", shooterSpeed);
+    SmartDashboard.putNumber("SHOOTER SPEED", shooterSpeed);
   }
 
   /**
@@ -69,11 +68,8 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SmartDashboard.putNumber("Shooter RPM", Math.abs(ShooterUpperEncoder.getVelocity()));
-    
 
   }
-
-
 
   public Command StartShoot() {
     return this.run(() -> {
@@ -90,30 +86,31 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void StartShootVoid(double distance) {
 
-    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), SmartDashboard.getNumber("SHOOTER SPEED", 3350)); //3350
+    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
+        SmartDashboard.getNumber("SHOOTER SPEED", 3350)); // 3350
     SmartDashboard.putNumber("Distance", distance);
     // if (distance != 0){
-    //    shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
-    // } 
+    // shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
+    // Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
+    // }
 
     ShooterUpper1Motor.set(shooter);
     ShooterUpper2Motor.set(-shooter);
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance) - 200) {
+    if (Math.abs(ShooterUpperEncoder.getVelocity()) > Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance)
+        - 200) {
       shooterLowerMotor.setControl(percentOutput.withOutput(1));
     }
   }
-
 
   public Command StartShootFull() {
     return this.run(() -> {
-    ShooterUpper1Motor.set(1);
-    ShooterUpper2Motor.set(-1);
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > 5000) {
-      shooterLowerMotor.setControl(percentOutput.withOutput(1));
-    }
+      ShooterUpper1Motor.set(1);
+      ShooterUpper2Motor.set(-1);
+      if (Math.abs(ShooterUpperEncoder.getVelocity()) > 5000) {
+        shooterLowerMotor.setControl(percentOutput.withOutput(1));
+      }
     });
   }
-
 
   public Command StopShoot() {
     return this.run(() -> {
@@ -126,12 +123,11 @@ public class ShooterSubsystem extends SubsystemBase {
     });
   }
 
-
   public Command RevShoot() {
     return this.run(() -> {
-    ShooterUpper1Motor.set(-0.5);
-    ShooterUpper2Motor.set(0.5);
-   
+      ShooterUpper1Motor.set(-0.5);
+      ShooterUpper2Motor.set(0.5);
+
       shooterLowerMotor.setControl(percentOutput.withOutput(-0.73));
 
     });
