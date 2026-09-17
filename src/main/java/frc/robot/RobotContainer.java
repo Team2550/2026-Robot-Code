@@ -160,7 +160,7 @@ public class RobotContainer {
         m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_driverController.x().negate())
         .onTrue(m_ShooterSubsystem.StopShoot());
 
-  m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate())
+  m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate()).and(m_operatorController.rightTrigger().negate()).and(m_operatorController.leftTrigger().negate())
       .onTrue(m_IntakeSubsystem.StopIntake());
     // Climber control
     m_operatorController.a()
@@ -187,6 +187,10 @@ public class RobotContainer {
     // Start Intake
     m_operatorController.rightTrigger()
         .onTrue(m_IntakeSubsystem.StartIntake());
+
+    // Reverse Intake
+    m_operatorController.leftTrigger()
+        .onTrue(m_IntakeSubsystem.ReverseIntake());
 
      m_operatorController.a()
        .whileTrue(AutoBuilder.buildAuto("Climb"));
