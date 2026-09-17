@@ -147,7 +147,7 @@ public class RobotContainer {
     m_driverController.rightTrigger()
         .onTrue(Commands.parallel(m_ShooterSubsystem.StartShoot(), m_AgitatorSubsystem.StartAgitator(),
             m_IntakeSubsystem.StartIntake()));
-     
+
     m_driverController.rightBumper().negate().and(m_driverController.rightTrigger().negate())
         .onTrue(m_AgitatorSubsystem.StopAgitator());
 
