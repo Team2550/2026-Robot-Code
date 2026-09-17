@@ -188,22 +188,10 @@ public class PhotonVision extends SubsystemBase {
 
         var estStdDevs = getEstimationStdDevs();
 
-        SmartDashboard.putNumber("Vision/EstX", VisionEst2d.getX());
-        SmartDashboard.putNumber("Vision/EstY", VisionEst2d.getY());
-        SmartDashboard.putNumber("Vision/EstTheta", VisionEst2d.getRotation().getDegrees());
-        SmartDashboard.putNumber("Vision/EstTimestamp", estPose.timestampSeconds);
-        SmartDashboard.putNumber("Vision/FpgaTimestamp", Timer.getFPGATimestamp());
-        SmartDashboard.putNumber("Vision/StdDevX", estStdDevs.get(0, 0));
-        SmartDashboard.putNumber("Vision/StdDevY", estStdDevs.get(1, 0));
-
         m_driveSubsystem.addVisionMeasurement(VisionEst2d, estPose.timestampSeconds, estStdDevs);
       }
     }
-
-
-
   }
-
 
 
     private void updateEstimationStdDevs(
@@ -211,7 +199,6 @@ public class PhotonVision extends SubsystemBase {
         if (estimatedPose.isEmpty()) {
             // No pose input. Default to single-tag std devs
             curStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
-
         } else {
             // Pose present. Start running Heuristic
             var estStdDevs = Constants.Subsystems.Vision.kSingleTagStdDevs;
@@ -281,7 +268,7 @@ public class PhotonVision extends SubsystemBase {
   public Command AimShoot() {
     return new RunCommand(() -> {
   
-          
+
           RunCamera();
           double distanceToTarget = PhotonUtils.getDistanceToPose(m_driveSubsystem.get2dPose(),
               Constants.Subsystems.Vision.kHubPoseBlue);

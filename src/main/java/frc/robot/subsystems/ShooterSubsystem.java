@@ -91,6 +91,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public void StartShootVoid(double distance) {
 
     double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), SmartDashboard.getNumber("SHOOTER SPEED", 3350)); //3350
+    SmartDashboard.putNumber("Distance", distance);
     // if (distance != 0){
     //    shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()), Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
     // } 
