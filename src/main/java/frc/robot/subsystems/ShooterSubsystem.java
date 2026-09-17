@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 // For CAN
 import com.revrobotics.spark.SparkMax;
@@ -18,7 +19,7 @@ import com.revrobotics.RelativeEncoder;
 
 //For kracken
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.TalonFX;
+//import com.ctre.phoenix6.hardware.TalonFX;
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -29,13 +30,24 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TalonFX shooterLowerMotor = new TalonFX(Constants.Subsystems.Shooter.kShooterLowerPort);
 
   private final RelativeEncoder ShooterUpperEncoder = ShooterUpper2Motor.getEncoder();
-  PIDController shooterPID = new PIDController(0.0004, 0.0003, 0.000017);
+
+  private double P = 0.0003;
+  private double I = 0.00;
+  private double D = 0.0000;
+
+  PIDController shooterPID = new PIDController(P, I, D);
+  SimpleMotorFeedforward shooterFeedforward = new SimpleMotorFeedforward(0.000, 0.00018);
+
   private final DutyCycleOut percentOutput = new DutyCycleOut(0);
   private final double shooterSpeed = 1000;
 
   public ShooterSubsystem() {
     // Configure the PID controller with the desired gains and settings
     SmartDashboard.putNumber("SHOOTER SPEED", shooterSpeed);
+    SmartDashboard.putNumber("P", P);
+    SmartDashboard.putNumber("I", I);
+    SmartDashboard.putNumber("D", D);
+
   }
 
   /**
@@ -68,6 +80,10 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SmartDashboard.putNumber("Shooter RPM", Math.abs(ShooterUpperEncoder.getVelocity()));
+    P = SmartDashboard.getNumber("P", P);
+    I = SmartDashboard.getNumber("I", I);
+    D = SmartDashboard.getNumber("D", D);
+    shooterPID = new PIDController(P, I, D);
 
   }
 
@@ -85,19 +101,18 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void StartShootVoid(double distance) {
-
-    double shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
-        SmartDashboard.getNumber("SHOOTER SPEED", 3350)); // 3350
     SmartDashboard.putNumber("Distance", distance);
     // if (distance != 0){
     // shooter = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
     // Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance));
     // }
+    double ffVoltage = shooterFeedforward.calculate(SmartDashboard.getNumber("SHOOTER SPEED", 3350) / 60);
+    double pidVoltage = shooterPID.calculate(Math.abs(ShooterUpperEncoder.getVelocity()),
+        SmartDashboard.getNumber("SHOOTER SPEED", 3350));
 
-    ShooterUpper1Motor.set(shooter);
-    ShooterUpper2Motor.set(-shooter);
-    if (Math.abs(ShooterUpperEncoder.getVelocity()) > Constants.Subsystems.Shooter.kShooterSpeedMap.get(distance)
-        - 200) {
+    ShooterUpper1Motor.setVoltage(pidVoltage + ffVoltage);
+    ShooterUpper2Motor.setVoltage(-(pidVoltage + ffVoltage));
+    if (Math.abs(ShooterUpperEncoder.getVelocity()) > SmartDashboard.getNumber("SHOOTER SPEED", 3350) - 200) {
       shooterLowerMotor.setControl(percentOutput.withOutput(1));
     }
   }

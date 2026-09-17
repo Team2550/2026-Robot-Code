@@ -35,7 +35,7 @@ public class PhotonVision extends SubsystemBase {
   private final ShooterSubsystem m_ShooterSubsystem;
   private final AgitatorSubsystem m_AgitatorSubsystem;
   private final IntakeSubsystem m_IntakeSubsystem;
-  private final ClimberSubsystem m_ClimberSubsystem;
+  // private final ClimberSubsystem m_ClimberSubsystem;
   private PhotonPoseEstimator photonEstimator;
   // private PhotonPoseEstimator photonEstimator2;
 
@@ -51,7 +51,6 @@ public class PhotonVision extends SubsystemBase {
   double rotaioionSpeed;
   double time = 0;
   boolean climbFirst = false;
-  private final Timer timer = new Timer();
   private Matrix<N3, N1> curStdDevs;
   Timer myTimer = new Timer();
 
@@ -63,12 +62,12 @@ public class PhotonVision extends SubsystemBase {
    * @param agitator shared AgitatorSubsystem
    */
   public PhotonVision(DriveSubsystem drive, ShooterSubsystem shooter, AgitatorSubsystem agitator,
-      IntakeSubsystem intake, ClimberSubsystem climb) {
+      IntakeSubsystem intake) { // , ClimberSubsystem climb == add if you want to use the climber
     this.m_driveSubsystem = drive;
     this.m_ShooterSubsystem = shooter;
     this.m_AgitatorSubsystem = agitator;
     this.m_IntakeSubsystem = intake;
-    this.m_ClimberSubsystem = climb;
+    // this.m_ClimberSubsystem = climb;
 
     camera = new PhotonCamera("MainCamera");
     // camera2 = new PhotonCamera("SecondaryCamera");

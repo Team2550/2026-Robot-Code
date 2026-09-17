@@ -44,7 +44,7 @@ public class RobotContainer {
   private final AgitatorSubsystem m_AgitatorSubsystem = new AgitatorSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final PhotonVision m_photonVision = new PhotonVision(m_driveSubsystem, m_ShooterSubsystem,
-      m_AgitatorSubsystem, m_IntakeSubsystem, m_ClimberSubsystem);
+      m_AgitatorSubsystem, m_IntakeSubsystem);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController = new CommandXboxController(Driver.kJoystickID);

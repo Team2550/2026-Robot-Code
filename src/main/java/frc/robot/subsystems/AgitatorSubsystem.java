@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 // For CAN
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 // For PWM
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 
 public class AgitatorSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private PWMVictorSPX AgitatorMotor = AgitatorMotor = new PWMVictorSPX(Constants.Subsystems.Agitator.kAgitatorPort);
+  private PWMVictorSPX AgitatorMotor = new PWMVictorSPX(Constants.Subsystems.Agitator.kAgitatorPort);
 
   public AgitatorSubsystem() {
 
